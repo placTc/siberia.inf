@@ -1,0 +1,8 @@
+{
+    "values": [
+        "siberia.inf:player_teleport_distance_check",
+        "siberia.inf:teleport_particles",
+        "siberia.inf:teleport_enable",
+        "siberia.inf:teleport"
+    ]
+}

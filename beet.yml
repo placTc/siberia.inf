@@ -1,0 +1,15 @@
+name: siberia.inf
+author: Team Siberia
+data_pack:
+  load:
+    - src
+require:
+  - bolt
+  - bolt_expressions
+pipeline:
+  - mecha
+output: build
+meta:
+  bolt:
+    entrypoint:
+      - siberia.inf:main
