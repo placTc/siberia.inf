@@ -1,0 +1,2 @@
+function siberia.inf:teleports/_tick:
+    function siberia.inf:teleports/particles/tick

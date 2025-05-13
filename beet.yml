@@ -12,4 +12,4 @@ output: build
 meta:
   bolt:
     entrypoint:
-      - siberia.inf:main
+      - siberia.inf:root

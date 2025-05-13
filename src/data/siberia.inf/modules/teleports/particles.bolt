@@ -1,0 +1,36 @@
+from bolt_expressions import Data
+
+particles_for_tags = {
+    ("inf.teleport_active",): (
+        "happy_villager ~ ~1 ~ 0.235 1 0.235 0.01 1 normal",
+        "dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal"
+    ),
+    ("inf.teleport", "!inf.teleport_active", "!inf.permanent_teleport"): (
+        "dust{color:[0.0,0.19,0.12],scale:1} ~ ~ ~ 0.25 0.25 0.25 0.001 2 normal",
+    ),
+    ("inf.permanent_teleport",): (
+        "happy_villager ~ ~1 ~ 0.235 1 0.235 0.01 1 normal",
+        "dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal"
+    )
+}
+
+dict_hash = hash(frozenset((tuple(particles_for_tags.items()), tuple(particles_for_tags.keys()))))
+
+memo dict_hash:
+    for tags, particles in particles_for_tags.items():
+        function f"siberia.inf:teleports/particles/_tag_particles/{hash(tags)}":
+            for particle in particles:
+                particle particle
+
+def particles_for_tag_execute(tags):
+    tags_temp = []
+    for t in tags:
+        tags_temp.append(f"tag={t}") 
+        
+    entity = f"@e[{','.join(tags_temp)}]"
+    raw (f"execute as {entity} at @s run function siberia.inf:teleports/particles/_tag_particles/{hash(tags)}")
+    
+memo dict_hash:
+    function siberia.inf:teleports/particles/tick:
+        for tags in particles_for_tags.keys():
+            particles_for_tag_execute(tags)
