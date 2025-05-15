@@ -1,8 +1,5 @@
 {
     "values": [
-        "siberia.inf:teleports/player_teleport_distance_check",
-        "siberia.inf:teleports/activate_teleport",
-        "siberia.inf:teleports/perform_teleport",
-        "siberia.inf:teleports/_tick"
+        "siberia.inf:teleports/tick/_tick"
     ]
 }

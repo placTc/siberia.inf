@@ -1,2 +1,9 @@
-function siberia.inf:teleports/_tick:
+from ../interactions/interaction_check import interaction_check
+from ./utils import TELEPORT_TAG
+
+function f"{__name__}/_tick":
     function siberia.inf:teleports/particles/tick
+    function siberia.inf:teleports/actions/activate
+    function siberia.inf:teleports/actions/attempt_perform
+    execute:
+        interaction_check(interactable_tag=TELEPORT_TAG, player_tag="inf.in_teleport")

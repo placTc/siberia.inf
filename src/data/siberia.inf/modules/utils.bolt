@@ -1,0 +1,16 @@
+from uuid import uuid4
+from bolt_expressions import Scoreboard
+from mecha import Mecha
+
+mc = ctx.inject(Mecha)
+
+def selector(value):
+  return mc.parse(value, using="selector")
+
+def generate_helper_function_unique_name() -> str:
+    return f"siberia.inf:_helpers/{uuid4()}"
+
+def debug_say(txt):
+    debug_mode = Scoreboard.objective("siberia.debug")
+    if debug_mode["@p"]:
+        tellraw @p [{text:"Debug >>> ",italic:true,color:"gray"},{text: txt, italic: false, color: "white"}]

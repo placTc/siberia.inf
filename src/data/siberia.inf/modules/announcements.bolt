@@ -1,24 +1,30 @@
 from bolt_expressions import Scoreboard
 
-announcements = {
-    1: "interworld_tp",
-    2: "overworld_tp"
-}
+def _pre_announce(func):
+    def wrap():
+        title @s clear
+        func()
+    
+    return wrap
 
-function siberia.inf:announcements/_internal/interworld_tp:
+@_pre_announce
+def _announce_interowrld_tp():
     title @s subtitle {"text":"A space between worlds","italic":true}
     title @s title {"text":"The Interworld","underlined":true,"color":"dark_aqua"}
 
-function siberia.inf:announcements/_internal/overworld_tp:
+@_pre_announce
+def _announce_overworld_tp():
     title @s title {text: "The Overworld"}
 
-def _pre_announce():
-    title @s clear
 
-function siberia.inf:announcements/announce:
+announcements = {
+    1: _announce_interowrld_tp,
+    2: _announce_overworld_tp
+}
+
+function f"{__name__}/announce":
     execute as @p:
         announcement = Scoreboard.objective("siberia.announce")
-        for ann in announcements:
-            if announcement["@s"] == ann:
-                _pre_announce()
-                raw (f"function siberia.inf:announcements/_internal/{announcements[ann]}")
+        for scoreboard_value, func in announcements.items():
+            if announcement["@s"] == scoreboard_value:
+                func()

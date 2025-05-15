@@ -1,0 +1,24 @@
+from ../utils import debug_say
+from ./utils import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG
+
+ACTIVATOR = "minecraft:glowstone_dust"
+
+def perform_teleport():
+    execute store result score @p siberia.announce run data get entity @n[tag=inf.teleport, distance=..0.5] data.tp.announce
+    function siberia.inf:tp_dimension with entity @n[tag=inf.teleport, distance=..0.5] data.tp
+    schedule function siberia.inf:announcements/announce 5t append
+
+function f"{__name__}/activate":
+    execute as @e[type=item, nbt={Item: {id: ACTIVATOR}}] at @s:
+        if entity @e[tag=TELEPORT_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5] unless entity @e[tag=TELEPORT_ACTIVE_TAG, distance=..0.5]:
+            debug_say("Activating teleport marker")
+            tag @e[tag=TELEPORT_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5] add TELEPORT_ACTIVE_TAG
+            kill @s
+
+function f"{__name__}/attempt_perform":
+    execute at @a[predicate=siberia.inf:teleportation_avaliable] as @p:
+        debug_say("Teleport option detected")
+    
+        unless entity @n[tag=!TELEPORT_ACTIVE_TAG, tag=!PERMANENT_TELEPORT_TAG, tag=TELEPORT_TAG] if entity @n[tag=TELEPORT_TAG, distance=..0.5]:
+            tag @n[tag=TELEPORT_ACTIVE_TAG, distance=..0.5] remove TELEPORT_ACTIVE_TAG
+            perform_teleport()

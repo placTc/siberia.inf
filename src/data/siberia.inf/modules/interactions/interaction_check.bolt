@@ -1,0 +1,22 @@
+from ../utils import debug_say
+
+def interaction_check(interactable_entity="minecraft:marker", player_tag="inf.in_interaction", interactable_tag="inf.interactable", distance=0.5):
+    """This function creates an interaction check for an entity with a specific tag, that grants a player a specific tag at a certain
+    distance from the interactable.
+
+    Args:
+        interactable_entity (str): the type of entity that will be marked interactable
+        player_tag (str): the tag that will be given to the player when inside the interaction
+        interactable_tag (str): the tag that the interactable has been tagged with
+        distance (float): the distance at which the player will be considered within the interaction zone
+    """
+
+    dist = f"..{distance}"
+    execute as @a[tag=!player_tag] at @s:
+        if entity @e[type=interactable_entity, distance=dist, tag=interactable_tag]:
+            tag @p add player_tag
+            debug_say(f"in interaction type={interactable_entity} tag={interactable_tag}")
+    execute as @a[tag=player_tag] at @s:
+        unless entity @e[type=interactable_entity, distance=dist] if entity @e[type=interactable_entity, tag=interactable_tag]:
+            tag @p remove player_tag
+            debug_say("out of interaction")

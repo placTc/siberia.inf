@@ -1,36 +1,48 @@
 from bolt_expressions import Data
+from ../utils import generate_helper_function_unique_name, selector
+from ./utils import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG, _not
+
+def _active_teleport_particles():
+    particle enchanted_hit ~ ~1 ~ 0.235 1 0.235 0.01 1 normal
+    particle dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal
+
+def _inactive_teleport_particles():
+    particle dust{color:[0.0,0.19,0.12],scale:1} ~ ~ ~ 0.25 0.25 0.25 0.001 2 normal
+
+def _permanent_teleport_particles():
+    particle portal ~ ~1 ~ 0.235 1 0.235 0.01 1 normal
+    particle dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal
 
 particles_for_tags = {
-    ("inf.teleport_active",): (
-        "happy_villager ~ ~1 ~ 0.235 1 0.235 0.01 1 normal",
-        "dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal"
-    ),
-    ("inf.teleport", "!inf.teleport_active", "!inf.permanent_teleport"): (
-        "dust{color:[0.0,0.19,0.12],scale:1} ~ ~ ~ 0.25 0.25 0.25 0.001 2 normal",
-    ),
-    ("inf.permanent_teleport",): (
-        "happy_villager ~ ~1 ~ 0.235 1 0.235 0.01 1 normal",
-        "dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal"
-    )
+    (TELEPORT_ACTIVE_TAG,): _active_teleport_particles,
+    (TELEPORT_TAG, _not(TELEPORT_ACTIVE_TAG), _not(PERMANENT_TELEPORT_TAG)): _inactive_teleport_particles,
+    (PERMANENT_TELEPORT_TAG,): _permanent_teleport_particles
 }
 
-dict_hash = hash(frozenset((tuple(particles_for_tags.items()), tuple(particles_for_tags.keys()))))
+# This, along with the application of `memo` in this module means that
+# the in-game functions should only change 
+dict_hash = hash(
+    frozenset(
+        (
+            tuple(particles_for_tags.items()),
+            tuple(particles_for_tags.keys())
+        )
+    )
+)
 
-memo dict_hash:
-    for tags, particles in particles_for_tags.items():
-        function f"siberia.inf:teleports/particles/_tag_particles/{hash(tags)}":
-            for particle in particles:
-                particle particle
-
-def particles_for_tag_execute(tags):
+def _make_internal_tags_selector(tags):
     tags_temp = []
     for t in tags:
         tags_temp.append(f"tag={t}") 
-        
-    entity = f"@e[{','.join(tags_temp)}]"
-    raw (f"execute as {entity} at @s run function siberia.inf:teleports/particles/_tag_particles/{hash(tags)}")
-    
-memo dict_hash:
-    function siberia.inf:teleports/particles/tick:
+
+    return ','.join(tags_temp)
+
+def particles_for_tag_execute(tags):
+    execute as selector(f"@e[{_make_internal_tags_selector(tags)}]") at @s:
+        particles_for_tags[tags]()
+
+
+function f"{__name__}/tick":
+    memo dict_hash:
         for tags in particles_for_tags.keys():
             particles_for_tag_execute(tags)
