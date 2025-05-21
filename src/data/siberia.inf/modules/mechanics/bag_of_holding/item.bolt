@@ -1,0 +1,62 @@
+from bolt_expressions import Data, Scoreboard
+
+from ../../utils import generate_helper_function_unique_name, selector
+from ../../infrastructure/uuid_entry_database import UUIDEntryDatabase
+
+function f"{__name__}/give":
+    give @p firework_star[
+        custom_name=[{"text":"Bag of Holding","italic":false,"color":"white"}],
+        lore=[
+            [{"text":"A bag containing a pocket dimenion","color":"gold"}],
+            [{"text":"created by skilled thaumaturges.","color":"gold"}]
+        ],
+        consumable={
+            consume_seconds:1000000,
+            animation:eat,
+            sound:"block.wool.step",
+            has_consume_particles:0b
+        },
+        max_stack_size=1,
+        custom_data={bag_of_holding:true, open:false},
+        tooltip_display={hidden_components:[unbreakable]}
+    ]
+
+tp_helper = generate_helper_function_unique_name()
+function helper:
+    $execute in $(dim) run tp $(x) $(y) $(z)
+
+def teleport_back(player):
+    database = UUIDEntryDatabase("back_tp")
+    db_name = database.database_name()
+    database.get(player)
+    execute as selector(player) run function helper with storage db_name out.loc
+
+def save_location(player):
+    database = UUIDEntryDatabase("back_tp")
+    player_data = Data.entity(player)
+    database.save_from(player, player_data.Pos[0], location="loc.x")
+    database.save_from(player, player_data.Pos[1], location="loc.y")
+    database.save_from(player, player_data.Pos[2], location="loc.z")
+    database.save_from(player, player_data.Dimension, location="loc.dim")
+
+function f"{__name__}/use":
+    player_data = Data.entity("@p")
+
+    revoke_helper = generate_helper_function_unique_name()
+    function revoke_helper:
+        advancement revoke @p only siberia.inf:mechanics/bag_of_holding/use
+
+    execute as @p:
+        if player_data.Dimension != "siberia.inf:interworld":
+            if player_data.SelectedItem.components["minecraft:custom_data"].open == False:
+                say open bag
+                save_location("@p")
+                execute in siberia.inf:bag_of_holding run tp 0 100 0
+            else:
+                say close bag
+                teleport_back("@p")
+        else:
+            say <placeholder> cannot use bag in interworld
+        
+        item modify entity @p weapon.mainhand siberia.inf:mechanics/bag_of_holding/change_bag_state
+        schedule function revoke_helper 0.2s

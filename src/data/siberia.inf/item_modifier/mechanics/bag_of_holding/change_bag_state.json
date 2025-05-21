@@ -1,0 +1,48 @@
+[
+  {
+    "function": "minecraft:set_custom_data",
+    "tag": {
+      "open": true
+    },
+    "conditions": [
+      {
+        "condition": "minecraft:entity_properties",
+        "entity": "this",
+        "predicate": {
+          "equipment": {
+            "mainhand": {
+              "predicates": {
+                "minecraft:custom_data": {
+                  "open": false
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "function": "minecraft:set_custom_data",
+    "tag": {
+      "open": false
+    },
+    "conditions": [
+      {
+        "condition": "minecraft:entity_properties",
+        "entity": "this",
+        "predicate": {
+          "equipment": {
+            "mainhand": {
+              "predicates": {
+                "minecraft:custom_data": {
+                  "open": true
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+]

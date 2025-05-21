@@ -1,0 +1,76 @@
+from bolt_expressions import Data
+from ../utils import selector, debug_say
+
+databases = set()
+
+def entry_macro(db_name):
+    a = (f"$execute unless data storage siberia.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}] run data modify storage siberia.ued:{db_name} entries append value {'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}")
+    raw (a)
+
+def get_macro(db_name): 
+    a = (f"$data modify storage siberia.ued:{db_name} out set from storage siberia.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}]")
+    raw (a)
+
+def set_macro(db_name):
+    a = (f"$data modify storage siberia.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}] set from storage siberia.ued:{db_name} in")
+    raw (a)
+
+def generate_macros(db_name):
+    function f"{__name__}/{db_name}/_new_entry_macro":
+        entry_macro(db_name)
+
+    function f"{__name__}/{db_name}/_get_macro":
+        get_macro(db_name)
+        
+    function f"{__name__}/{db_name}/_set_macro":
+        set_macro(db_name)
+
+class UUIDEntryDatabase:
+    """
+    Database objects that creates a new database for every new instance
+    """
+    def __init__(self, database):
+        self.database = database
+        if not database in databases:
+            generate_macros(self.database)
+            databases.add(database)
+
+    def _get_uuid(self, selector):
+        entity_uuid = Data.entity(selector).UUID
+        storage = Data.storage(f"siberia.ued:{self.database}")
+
+        storage.args["UUID0"] = entity_uuid[0]
+        storage.args["UUID1"] = entity_uuid[1]
+        storage.args["UUID2"] = entity_uuid[2]
+        storage.args["UUID3"] = entity_uuid[3]
+
+    def new_entry(self, select):
+        debug_say(f"adding entry to database {self.database}")
+        self._get_uuid(select)
+        function f"{__name__}/{self.database}/_new_entry_macro" with storage f"siberia.ued:{self.database}" args
+
+    def _save(self, select):
+        execute unless data storage f"siberia.ued:{self.database}" in.UUID run data modify storage f"siberia.ued:{self.database}" in.UUID set from entity selector(select) UUID
+        function f"{__name__}/{self.database}/_set_macro" with storage f"siberia.ued:{self.database}" args
+
+    def save_value(self, select, data, location):
+        debug_say(f"saving entry in database {self.database} data={data}")
+        self._get_uuid(selector)
+        data modify storage f"siberia.ued:{self.database}" f"in.{location}" set value data
+        execute unless data storage f"siberia.ued:{self.database}" in.UUID run data modify storage f"siberia.ued:{self.database}" in.UUID set from entity selector(select) UUID
+        function f"{__name__}/{self.database}/_set_macro" with storage f"siberia.ued:{self.database}" args
+
+    def save_from(self, select, datasource, location):
+        debug_say(f"saving entry in database {self.database} datasource={datasource}")
+        self._get_uuid(select)
+        raw (f"data modify storage siberia.ued:{self.database} in.{location} set from {datasource}")
+        self._save(select)
+
+    def get(self, select):
+        debug_say(f"getting data from {select}")
+        self._get_uuid(select)
+        function f"{__name__}/{self.database}/_get_macro" with storage f"siberia.ued:{self.database}" args
+
+    def database_name(self):
+        return f"siberia.ued:{self.database}"
+        
