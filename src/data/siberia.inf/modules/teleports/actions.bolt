@@ -1,28 +1,61 @@
-from ../utils import debug_say
+from ../utils import debug_say, generate_helper_function_unique_name
 from ./utils import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG
 
 ACTIVATOR = "minecraft:glowstone_dust"
+DEACTIVATOR = "minecraft:coal"
 
 function f"{__name__}/tp_dimension":
     $execute in $(dimension) as @n[type=minecraft:player] run tp $(x) $(y) $(z)
 
+def schedule_announce(ticks):
+    execute store result score @p siberia.announce run data get entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp.announce
+    schedule function siberia.inf:announcements/announce ticks append
+
+def schedule_sound(ticks):
+    helper = generate_helper_function_unique_name()
+    function helper:
+        execute at @p playsound minecraft:block.bell.resonate master @p ~ ~ ~ 0.1 2
+    
+    schedule function helper ticks append
+
+def give_effects():
+    effect give @p slowness 1 255
+    effect give @p blindness 2 255
+
 def perform_teleport():
     debug_say("Attempting teleport")
-    execute store result score @p siberia.announce run data get entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp.announce
+    execute at @p playsound minecraft:entity.enderman.teleport master @p ~ ~ ~ 0.1 2
+    schedule_announce(2)
+    schedule_sound(1)
+    give_effects()
     function f"{__name__}/tp_dimension" with entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp
-    schedule function siberia.inf:announcements/announce 2t append
+    
 
 function f"{__name__}/activate":
     execute as @e[type=item, nbt={Item: {id: ACTIVATOR}}] at @s:
         if entity @e[tag=TELEPORT_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5, limit=1] unless entity @e[tag=TELEPORT_ACTIVE_TAG, distance=..0.5, limit=1]:
             debug_say("Activating teleport marker")
             tag @e[tag=TELEPORT_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5] add TELEPORT_ACTIVE_TAG
+            particle portal ~ ~ ~ 0.25 0.25 0.25 1 50 normal
+            playsound minecraft:block.crafter.craft master @a ~ ~ ~ 0.7 0.2
+            playsound minecraft:block.beacon.power_select master @a ~ ~ ~ 0.4 1.4
+            playsound minecraft:block.beacon.power_select master @a ~ ~ ~ 0.2 0.5
+            kill @s
+
+function f"{__name__}/deactivate":
+    execute as @e[type=item, nbt={Item: {id: DEACTIVATOR}}] at @s:
+        if entity @e[tag=TELEPORT_ACTIVE_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5, limit=1]:
+            debug_say("Deactivating teleport marker")
+            tag @e[tag=TELEPORT_ACTIVE_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5] remove TELEPORT_ACTIVE_TAG
+            summon minecraft:item ~ ~ ~ {Item: {id: ACTIVATOR},Motion:[0.0d, 0.5d, 0.0d]}
+            particle smoke ~ ~ ~ 0.25 0.25 0.25 0.03 20 normal
+            playsound minecraft:entity.ender_eye.death master @a ~ ~ ~ 0.2 0.2
             kill @s
 
 function f"{__name__}/attempt_perform":
     execute as @a[tag=inf.in_teleport] at @s:
         debug_say("Teleport option detected")
     
-        if entity @n[predicate=siberia.inf:is_active_teleport]:
-            tag @n[predicate=siberia.inf:is_active_teleport] remove TELEPORT_ACTIVE_TAG
+        if entity @n[predicate=siberia.inf:is_active_teleport, distance=..0.5, limit=1]:
+            tag @n[predicate=siberia.inf:is_active_teleport, distance=..0.5, limit=1] remove TELEPORT_ACTIVE_TAG
             perform_teleport()

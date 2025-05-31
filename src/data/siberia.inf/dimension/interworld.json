@@ -2,7 +2,7 @@
     "generator": {
         "type": "flat",
         "settings": {
-            "biome": "the_void",
+            "biome": "the_end",
             "layers": []
         }
     },

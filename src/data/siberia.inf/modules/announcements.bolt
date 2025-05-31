@@ -9,8 +9,8 @@ def _pre_announce(func):
 
 @_pre_announce
 def _announce_interowrld_tp():
-    title @s subtitle {"text":"A space between worlds","italic":true}
-    title @s title {"text":"The Interworld","underlined":true,"color":"dark_aqua"}
+    title @s subtitle {"text":"The Home of the Keeper of Secrets","italic":true}
+    title @s title {"text":"Baré's Domain","underlined":false,"color":"dark_aqua"}
 
 @_pre_announce
 def _announce_nether_tp():
@@ -20,11 +20,15 @@ def _announce_nether_tp():
 def _announce_overworld_tp():
     title @s title {text: "The Overworld"}
 
+@_pre_announce
+def _announce_baloshod_tp():
+    title @s title {text: "Baloshod"}
 
 announcements = {
     1: _announce_interowrld_tp,
     2: _announce_overworld_tp,
-    3: _announce_nether_tp
+    3: _announce_nether_tp,
+    4: _announce_baloshod_tp
 }
 
 function f"{__name__}/announce":

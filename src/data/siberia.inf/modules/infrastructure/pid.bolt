@@ -1,0 +1,14 @@
+from bolt_expressions import Scoreboard
+
+pid = Scoreboard.objective("siberia.pid")
+
+function f"{__name__}/load":
+    if pid["$total"] == 0:
+        pid["$total"] = 1
+
+function f"{__name__}/tick":
+    pid["@a"] += 0
+    execute as @a[scores={siberia.pid=0}]:
+        pid["@s"] = pid["$total"]
+        pid["$total"] += 1
+        
