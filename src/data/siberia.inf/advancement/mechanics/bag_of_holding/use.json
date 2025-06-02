@@ -3,23 +3,17 @@
     "used_bag": {
       "trigger": "minecraft:using_item",
       "conditions": {
-        "conditions": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "equipment": {
-                "mainhand": {
-                  "predicates": {
-                    "minecraft:custom_data": {
-                      "bag_of_holding": true
-                    }
-                  }
+        "player": {
+          "equipment": {
+            "mainhand": {
+              "components": {
+                "minecraft:custom_data": {
+                  "bag_of_holding": true
                 }
               }
             }
           }
-        ]
+        }
       }
     }
   },

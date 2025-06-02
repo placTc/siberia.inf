@@ -3,7 +3,7 @@ from bolt_expressions import Data, Scoreboard
 from ../../utils import generate_helper_function_unique_name, selector, executor_in_debug_mode, debug_say
 from ../../infrastructure/uuid_entry_database import UUIDEntryDatabase
 from ../../infrastructure/forceload_manager import ForceloadManager
-from ./common import DATABASE_NAME, close_bag
+from ./common import DATABASE_NAME, close_bag, TP_HELPER
 from ./room import initialize_room
 
 function f"{__name__}/give":
@@ -21,12 +21,9 @@ function f"{__name__}/give":
             has_consume_particles:0b
         },
         max_stack_size=1,
-        tooltip_display={hidden_components:[unbreakable]}
+        tooltip_display={hidden_components:[unbreakable]},
+        custom_data={bag_of_holding: 1b}
     ]
-
-tp_helper = generate_helper_function_unique_name()
-function helper:
-    $execute in $(dim) run tp $(x) $(y) $(z)
 
 def open_bag(player="@s"):
     debug_say("open bag")
@@ -46,7 +43,7 @@ def open_bag(player="@s"):
     database.save_from(player, player_data.Dimension, location="back_tp.dim")    
     
     database.get(player)
-    execute as selector(player) run function helper with storage db_name out.bag_coords
+    execute as selector(player) run function TP_HELPER with storage db_name out.bag_coords
     if executor_in_debug_mode():
         gamemode creative
     else:
@@ -65,6 +62,5 @@ function f"{__name__}/use":
             open_bag()
         else:
             close_bag()
-
         
         schedule function revoke_helper 0.2s

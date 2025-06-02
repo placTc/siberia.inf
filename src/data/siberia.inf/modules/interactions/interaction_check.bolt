@@ -17,6 +17,6 @@ def interaction_check(interactable_entity="minecraft:marker", player_tag="inf.in
             tag @p add player_tag
             debug_say(f"in interaction type={interactable_entity} tag={interactable_tag}")
     execute as @a[tag=player_tag] at @s:
-        unless entity @e[type=interactable_entity, distance=dist] if entity @e[type=interactable_entity, tag=interactable_tag]:
+        unless entity @e[type=interactable_entity, distance=dist]:
             tag @p remove player_tag
             debug_say("out of interaction")
