@@ -18,8 +18,4 @@ def debug_say(txt):
     if debug_mode["@p"]:
         tellraw @p [{text:"Debug >>> ",italic:true,color:"gray"},{text: txt, italic: false, color: "white"}]
 
-def executor_in_debug_mode():
-    if Scoreboard.objective("siberia.debug")["@s"]:
-        return True
-    else:
-        return False
+DEBUG = Scoreboard.objective("siberia.debug")["@s"]

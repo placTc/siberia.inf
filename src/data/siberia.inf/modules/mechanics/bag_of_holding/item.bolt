@@ -1,6 +1,6 @@
 from bolt_expressions import Data, Scoreboard
 
-from ../../utils import generate_helper_function_unique_name, selector, executor_in_debug_mode, debug_say
+from ../../utils import generate_helper_function_unique_name, selector, DEBUG, debug_say
 from ../../infrastructure/uuid_entry_database import UUIDEntryDatabase
 from ../../infrastructure/forceload_manager import ForceloadManager
 from ./common import DATABASE_NAME, close_bag, TP_HELPER
@@ -44,10 +44,12 @@ def open_bag(player="@s"):
     
     database.get(player)
     execute as selector(player) run function TP_HELPER with storage db_name out.bag_coords
-    if executor_in_debug_mode():
+    item replace entity selector(player) weapon.mainhand with air
+
+    if DEBUG:
         gamemode creative
     else:
-        gamemode survival
+        gamemode adventure
 
 
 function f"{__name__}/use":

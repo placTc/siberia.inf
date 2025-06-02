@@ -1,6 +1,6 @@
 from bolt_expressions import Scoreboard, Data
 
-from ../../utils import generate_helper_function_unique_name, selector, executor_in_debug_mode, debug_say
+from ../../utils import generate_helper_function_unique_name, debug_say
 from ../../infrastructure/uuid_entry_database import UUIDEntryDatabase
 from ../../infrastructure/forceload_manager import ForceloadManager
 from ../../interactions/interaction_check import interaction_check
@@ -9,15 +9,12 @@ from ../../tags import BAG_OF_HOLDING_EXIT_TAG, IN_BAG_OF_HOLDING_EXIT_TAG
 
 EXIT_TAG = BAG_OF_HOLDING_EXIT_TAG
 PLAYER_TAG = IN_BAG_OF_HOLDING_EXIT_TAG
-
-tick_helper = generate_helper_function_unique_name("boh_tick")
-function tick_helper:
-    execute as @a[tag=PLAYER_TAG] at @s:
-        close_bag()
+    
 
 function f"{__name__}/tick":
     interaction_check(interactable_tag=EXIT_TAG, player_tag=PLAYER_TAG)
-    function tick_helper
+    execute as @a[tag=PLAYER_TAG] at @s:
+        close_bag()
 
 place_helper = generate_helper_function_unique_name("place_helper")
 function place_helper:

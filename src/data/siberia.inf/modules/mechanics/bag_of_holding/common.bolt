@@ -1,6 +1,6 @@
 from bolt_expressions import Data, Scoreboard
 from ../../infrastructure/uuid_entry_database import UUIDEntryDatabase
-from ../../utils import executor_in_debug_mode, debug_say, selector, generate_helper_function_unique_name
+from ../../utils import DEBUG, debug_say, selector, generate_helper_function_unique_name
 
 DATABASE_NAME = "bag_of_holding"
 
@@ -16,9 +16,11 @@ def close_bag(player="@s"):
         database = UUIDEntryDatabase(DATABASE_NAME)
         db_name = database.database_name()
         database.get(player)
-        execute as selector(player) run function TP_HELPER with storage db_name out.back_tp
+        execute as selector(player):
+            function TP_HELPER with storage db_name out.back_tp
+            schedule function siberia.inf:mechanics/bag_of_holding/item/give 1
 
-        if executor_in_debug_mode():
+        if DEBUG:
             gamemode creative
         else:
             gamemode survival

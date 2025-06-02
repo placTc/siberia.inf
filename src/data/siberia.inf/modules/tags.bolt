@@ -1,6 +1,8 @@
 def _not(tag):
     return f"!{tag}"
 
+HIDE_PARTICLES_TAG = "inf.hide_particles"
+
 TELEPORT_TAG = "inf.teleport"
 TELEPORT_ACTIVE_TAG = "inf.teleport_active"
 PERMANENT_TELEPORT_TAG = "inf.permanent_teleport"

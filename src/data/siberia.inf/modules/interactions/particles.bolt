@@ -1,6 +1,6 @@
 from bolt_expressions import Data
 from ../utils import generate_helper_function_unique_name, selector
-from ../tags import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG, _not, BAG_OF_HOLDING_EXIT_TAG
+from ../tags import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG, _not, BAG_OF_HOLDING_EXIT_TAG, HIDE_PARTICLES_TAG
 
 def _active_teleport_particles():
     particle trial_spawner_detection ~ ~ ~ 0.125 1.7 0.125 0.0001 4 normal
@@ -15,6 +15,7 @@ def _permanent_teleport_particles():
     particle end_rod ~ ~1.25 ~ 0.1 1.2 0.1 0.002 1 normal
 
 def _bag_of_holding_exit_particles():
+
     particle enchanted_hit ~ ~1 ~ 0.235 1 0.235 0.01 1 normal
     # particle dust_color_transition{from_color:[0.0,0.0,0.0],to_color:[0.6,0.76,0.95],scale:1} ~ ~1 ~ 0.25 1 0.25 1 50 normal
     particle dust_color_transition{from_color:[0.0,0.0,0.0],to_color:[0,0,0],scale:1} ~ ~1 ~ 0.25 1 0.25 1 50 normal
@@ -45,7 +46,7 @@ def _make_internal_tags_selector(tags):
     return ','.join(tags_temp)
 
 def particles_for_tag_execute(tags):
-    execute as selector(f"@e[{_make_internal_tags_selector(tags)}]") at @s:
+    execute as selector(f"@e[{_make_internal_tags_selector(tags)}, tag=!{HIDE_PARTICLES_TAG}]") at @s:
         particles_for_tags[tags]()
 
 
