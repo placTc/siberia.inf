@@ -1,5 +1,7 @@
-from ../utils import debug_say, generate_helper_function_unique_name
-from ./utils import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG
+from bolt_expressions import Data
+
+from ../utils import debug_say, generate_helper_function_unique_name, selector
+from ../tags import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG
 
 ACTIVATOR = "minecraft:glowstone_dust"
 DEACTIVATOR = "minecraft:coal"
@@ -30,6 +32,12 @@ def perform_teleport():
     give_effects()
     function f"{__name__}/tp_dimension" with entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp
     
+def reduce_item_stack(select="@s", amount=1):
+    item_data = Data.entity(select)
+    if item_data.Item.count <= amount:
+        kill selector(select)
+    else:
+        item_data.Item.count -= amount
 
 function f"{__name__}/activate":
     execute as @e[type=item, nbt={Item: {id: ACTIVATOR}}] at @s:
@@ -40,17 +48,18 @@ function f"{__name__}/activate":
             playsound minecraft:block.crafter.craft master @a ~ ~ ~ 0.7 0.2
             playsound minecraft:block.beacon.power_select master @a ~ ~ ~ 0.4 1.4
             playsound minecraft:block.beacon.power_select master @a ~ ~ ~ 0.2 0.5
-            kill @s
+            reduce_item_stack()
 
 function f"{__name__}/deactivate":
     execute as @e[type=item, nbt={Item: {id: DEACTIVATOR}}] at @s:
+        item_data = Data.entity("@s")
         if entity @e[tag=TELEPORT_ACTIVE_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5, limit=1]:
             debug_say("Deactivating teleport marker")
             tag @e[tag=TELEPORT_ACTIVE_TAG, tag=!PERMANENT_TELEPORT_TAG, distance=..0.5] remove TELEPORT_ACTIVE_TAG
             summon minecraft:item ~ ~ ~ {Item: {id: ACTIVATOR},Motion:[0.0d, 0.5d, 0.0d]}
             particle smoke ~ ~ ~ 0.25 0.25 0.25 0.03 20 normal
             playsound minecraft:entity.ender_eye.death master @a ~ ~ ~ 0.2 0.2
-            kill @s
+            reduce_item_stack()
 
 function f"{__name__}/attempt_perform":
     execute as @a[tag=inf.in_teleport] at @s:

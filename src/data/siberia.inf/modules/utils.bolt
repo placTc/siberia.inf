@@ -7,10 +7,19 @@ mc = ctx.inject(Mecha)
 def selector(value):
   return mc.parse(value, using="selector")
 
-def generate_helper_function_unique_name() -> str:
-    return f"siberia.inf:_helpers/{uuid4()}"
+def generate_helper_function_unique_name(name="") -> str:
+    if not name:
+        return f"siberia.inf:_helpers/{uuid4()}"
+    else:
+        return f"siberia.inf:_helpers/{uuid4()}_{name}"
 
 def debug_say(txt):
     debug_mode = Scoreboard.objective("siberia.debug")
     if debug_mode["@p"]:
         tellraw @p [{text:"Debug >>> ",italic:true,color:"gray"},{text: txt, italic: false, color: "white"}]
+
+def executor_in_debug_mode():
+    if Scoreboard.objective("siberia.debug")["@s"]:
+        return True
+    else:
+        return False

@@ -1,0 +1,29 @@
+from contextlib import contextmanager
+from ../utils import selector, debug_say, generate_helper_function_unique_name
+from uuid import uuid4
+from bolt_expressions import Data
+
+INTERNAL_STORAGE_NAME = "siberia.inf:_flh"
+
+forceload_helper = generate_helper_function_unique_name()
+function forceload_helper:
+    $execute in $(dim) run forceload add $(x1) $(z1) $(x2) $(z2)
+
+forceunload_helper = generate_helper_function_unique_name()
+function forceunload_helper:
+    $execute in $(dim) run forceload remove $(x1) $(z1) $(x2) $(z2)
+
+class ForceloadManager:
+    def __init__(self, x1, z1, x2, z2, dim):
+        storage = Data.storage(INTERNAL_STORAGE_NAME)
+        storage.x1 = x1
+        storage.z1 = z1
+        storage.x2 = x2
+        storage.z2 = z2
+        storage.dim = dim
+
+    def __enter__(self):
+        function forceload_helper with storage INTERNAL_STORAGE_NAME
+
+    def __exit__(self, *args, **kwargs):
+        function forceunload_helper with storage INTERNAL_STORAGE_NAME

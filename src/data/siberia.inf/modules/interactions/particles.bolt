@@ -1,10 +1,8 @@
 from bolt_expressions import Data
 from ../utils import generate_helper_function_unique_name, selector
-from ./utils import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG, _not
+from ../tags import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG, _not, BAG_OF_HOLDING_EXIT_TAG
 
 def _active_teleport_particles():
-    #
-    #particle dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal
     particle trial_spawner_detection ~ ~ ~ 0.125 1.7 0.125 0.0001 4 normal
     particle end_rod ~ ~1.25 ~ 0.1 1.2 0.1 0.002 1 normal
 
@@ -12,16 +10,20 @@ def _inactive_teleport_particles():
     particle dust_color_transition{from_color:[0.0,0.0,0.0],to_color:[0.78,0.27,0.0],scale:1} ~ ~ ~ 0.25 0.1 0.25 0.001 2 normal
 
 def _permanent_teleport_particles():
-    #particle dust_color_transition{from_color:[0.38,0.21,0.51],to_color:[0.15,0.64,0.41],scale:1} ~ ~1.25 ~ 0.1 1 0.1 0.01 5 normal
-    #particle portal ~ ~1 ~ 0.235 1 0.235 0.01 1 normal
     particle enchanted_hit ~ ~1 ~ 0.235 1 0.235 0.01 1 normal
     particle trial_spawner_detection_ominous ~ ~ ~ 0.125 1.7 0.125 0.0001 4 normal
     particle end_rod ~ ~1.25 ~ 0.1 1.2 0.1 0.002 1 normal
 
+def _bag_of_holding_exit_particles():
+    particle enchanted_hit ~ ~1 ~ 0.235 1 0.235 0.01 1 normal
+    # particle dust_color_transition{from_color:[0.0,0.0,0.0],to_color:[0.6,0.76,0.95],scale:1} ~ ~1 ~ 0.25 1 0.25 1 50 normal
+    particle dust_color_transition{from_color:[0.0,0.0,0.0],to_color:[0,0,0],scale:1} ~ ~1 ~ 0.25 1 0.25 1 50 normal
+
 particles_for_tags = {
     (TELEPORT_ACTIVE_TAG,): _active_teleport_particles,
     (TELEPORT_TAG, _not(TELEPORT_ACTIVE_TAG), _not(PERMANENT_TELEPORT_TAG)): _inactive_teleport_particles,
-    (PERMANENT_TELEPORT_TAG,): _permanent_teleport_particles
+    (PERMANENT_TELEPORT_TAG,): _permanent_teleport_particles,
+    (BAG_OF_HOLDING_EXIT_TAG,): _bag_of_holding_exit_particles
 }
 
 # This, along with the application of `memo` in this module means that

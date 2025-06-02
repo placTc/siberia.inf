@@ -1,0 +1,40 @@
+from bolt_expressions import Scoreboard, Data
+
+from ../../utils import generate_helper_function_unique_name, selector, executor_in_debug_mode, debug_say
+from ../../infrastructure/uuid_entry_database import UUIDEntryDatabase
+from ../../infrastructure/forceload_manager import ForceloadManager
+from ../../interactions/interaction_check import interaction_check
+from ./common import DATABASE_NAME, close_bag
+from ../../tags import BAG_OF_HOLDING_EXIT_TAG, IN_BAG_OF_HOLDING_EXIT_TAG
+
+EXIT_TAG = BAG_OF_HOLDING_EXIT_TAG
+PLAYER_TAG = IN_BAG_OF_HOLDING_EXIT_TAG
+
+tick_helper = generate_helper_function_unique_name("boh_tick")
+function tick_helper:
+    execute as @a[tag=PLAYER_TAG] at @s:
+        close_bag()
+
+function f"{__name__}/tick":
+    interaction_check(interactable_tag=EXIT_TAG, player_tag=PLAYER_TAG)
+    function tick_helper
+
+place_helper = generate_helper_function_unique_name("place_helper")
+function place_helper:
+    $execute in siberia.inf:bag_of_holding run place template siberia.inf:bag_of_holding 0 100 $(z) none none 1 0 strict
+
+def initialize_room(player="@s"):
+    pid = Scoreboard.objective("siberia.pid")[player]
+    initialized = Scoreboard.objective("siberia.bag_of_holding_initialized")[player]
+    database = UUIDEntryDatabase(DATABASE_NAME)
+    temp = Data.storage("sib.temp")
+
+    if initialized < 1:
+        temp.z = pid * 10 + 4
+        database.save_value(player, '{x: 4, y: 101, dim: "siberia.inf:bag_of_holding"}', "bag_coords")
+        database.save_from(player, temp.z, "bag_coords.z")
+        temp.z = pid * 10
+        debug_say("placing")
+        with ForceloadManager(0, 0, 0, pid * 10 + 4, "siberia.inf:bag_of_holding"):
+            function place_helper with storage sib.temp
+        initialized = 1

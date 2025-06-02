@@ -1,0 +1,11 @@
+def _not(tag):
+    return f"!{tag}"
+
+TELEPORT_TAG = "inf.teleport"
+TELEPORT_ACTIVE_TAG = "inf.teleport_active"
+PERMANENT_TELEPORT_TAG = "inf.permanent_teleport"
+
+IN_TELEPORT_TAG = "inf.in_teleport"
+
+BAG_OF_HOLDING_EXIT_TAG = "inf.bag_of_holding_exit"
+IN_BAG_OF_HOLDING_EXIT_TAG = "inf.in_bag_of_holding_exit"

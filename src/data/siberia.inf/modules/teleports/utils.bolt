@@ -1,7 +1,0 @@
-TELEPORT_TAG = "inf.teleport"
-TELEPORT_ACTIVE_TAG = "inf.teleport_active"
-PERMANENT_TELEPORT_TAG = "inf.permanent_teleport"
-
-def _not(tag):
-    return f"!{tag}"
-

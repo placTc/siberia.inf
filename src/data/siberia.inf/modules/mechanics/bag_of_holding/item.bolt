@@ -1,7 +1,10 @@
 from bolt_expressions import Data, Scoreboard
 
-from ../../utils import generate_helper_function_unique_name, selector
+from ../../utils import generate_helper_function_unique_name, selector, executor_in_debug_mode, debug_say
 from ../../infrastructure/uuid_entry_database import UUIDEntryDatabase
+from ../../infrastructure/forceload_manager import ForceloadManager
+from ./common import DATABASE_NAME, close_bag
+from ./room import initialize_room
 
 function f"{__name__}/give":
     give @p firework_star[
@@ -18,7 +21,6 @@ function f"{__name__}/give":
             has_consume_particles:0b
         },
         max_stack_size=1,
-        custom_data={bag_of_holding:true, open:false},
         tooltip_display={hidden_components:[unbreakable]}
     ]
 
@@ -26,40 +28,43 @@ tp_helper = generate_helper_function_unique_name()
 function helper:
     $execute in $(dim) run tp $(x) $(y) $(z)
 
-def teleport_back(player):
-    database = UUIDEntryDatabase("back_tp")
-    db_name = database.database_name()
-    database.get(player)
-    execute as selector(player) run function helper with storage db_name out.loc
+def open_bag(player="@s"):
+    debug_say("open bag")
+    Scoreboard.objective("siberia.bag_of_holding_open")[player] = 1
 
-def save_location(player):
-    database = UUIDEntryDatabase("back_tp")
+    temp = Data.storage("sib.temp")
+    database = UUIDEntryDatabase(DATABASE_NAME)
     player_data = Data.entity(player)
-    database.save_from(player, player_data.Pos[0], location="loc.x")
-    database.save_from(player, player_data.Pos[1], location="loc.y")
-    database.save_from(player, player_data.Pos[2], location="loc.z")
-    database.save_from(player, player_data.Dimension, location="loc.dim")
+    db_name = database.database_name()
+
+    initialize_room()
+
+
+    database.save_from(player, player_data.Pos[0], location="back_tp.x")
+    database.save_from(player, player_data.Pos[1], location="back_tp.y")
+    database.save_from(player, player_data.Pos[2], location="back_tp.z")
+    database.save_from(player, player_data.Dimension, location="back_tp.dim")    
+    
+    database.get(player)
+    execute as selector(player) run function helper with storage db_name out.bag_coords
+    if executor_in_debug_mode():
+        gamemode creative
+    else:
+        gamemode survival
+
 
 function f"{__name__}/use":
-    player_data = Data.entity("@p")
-    bag_of_holding_open = Scoreboard.objective("siberia.bag_of_holding_open")
+    bag_of_holding_open = Scoreboard.objective("siberia.bag_of_holding_open")["@s"]
 
     revoke_helper = generate_helper_function_unique_name()
     function revoke_helper:
         advancement revoke @p only siberia.inf:mechanics/bag_of_holding/use
 
     execute as @p:
-        if bag_of_holding_open["@s"] == 1:
-            bag_of_holding_open["@s"] = 0
-            say open bag
-            save_location("@p")
-            execute in siberia.inf:bag_of_holding run tp 0 100 0
-            gamemode adventure
+        if bag_of_holding_open == 0:
+            open_bag()
         else:
-            bag_of_holding_open["@s"] = 1
-            say close bag
-            teleport_back("@p")
-            gamemode survival
+            close_bag()
 
         
         schedule function revoke_helper 0.2s

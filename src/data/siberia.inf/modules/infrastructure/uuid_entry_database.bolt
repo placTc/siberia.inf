@@ -35,8 +35,8 @@ class UUIDEntryDatabase:
             generate_macros(self.database)
             databases.add(database)
 
-    def _get_uuid(self, selector):
-        entity_uuid = Data.entity(selector).UUID
+    def _get_uuid(self, select):
+        entity_uuid = Data.entity(select).UUID
         storage = Data.storage(f"siberia.ued:{self.database}")
 
         storage.args["UUID0"] = entity_uuid[0]
@@ -55,10 +55,9 @@ class UUIDEntryDatabase:
 
     def save_value(self, select, data, location):
         debug_say(f"saving entry in database {self.database} data={data}")
-        self._get_uuid(selector)
-        data modify storage f"siberia.ued:{self.database}" f"in.{location}" set value data
-        execute unless data storage f"siberia.ued:{self.database}" in.UUID run data modify storage f"siberia.ued:{self.database}" in.UUID set from entity selector(select) UUID
-        function f"{__name__}/{self.database}/_set_macro" with storage f"siberia.ued:{self.database}" args
+        self._get_uuid(select)
+        raw (f"data modify storage siberia.ued:{self.database} in.{location} set value {data}")
+        self._save(select)
 
     def save_from(self, select, datasource, location):
         debug_say(f"saving entry in database {self.database} datasource={datasource}")

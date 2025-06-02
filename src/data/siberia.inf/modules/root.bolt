@@ -1,6 +1,8 @@
-import ./data as data
 import ./announcements as announcements
+import ./data as data
+import ./tags as tags
 
 import ./teleports/root as teleports
 import ./mechanics/root as mechanics
 import ./infrastructure/root as infrastructure
+import ./interactions/root as interactions

@@ -1,6 +1,8 @@
 {
     "values": [
         "siberia.inf:teleports/tick/_tick",
-        "siberia.inf:infrastructure/pid/tick"
+        "siberia.inf:infrastructure/pid/tick",
+        "siberia.inf:interactions/particles/tick",
+        "siberia.inf:mechanics/bag_of_holding/room/tick"
     ]
 }
