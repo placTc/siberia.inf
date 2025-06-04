@@ -1,0 +1,13 @@
+{
+    "condition": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "location": {
+        "dimension": "siberia.inf:bag_of_holding"
+      },
+      "type": "minecraft:item",
+      "flags": {
+        "is_on_ground": true
+      }
+    }
+  }

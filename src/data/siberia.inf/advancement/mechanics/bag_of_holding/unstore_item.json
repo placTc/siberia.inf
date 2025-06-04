@@ -1,0 +1,21 @@
+{
+    "criteria": {
+        "display_right_clicked": {
+            "trigger": "minecraft:player_interacted_with_entity",
+            "conditions": {
+                "entity": {
+                    "type": "minecraft:interaction",
+                    "nbt": "{Tags: [\"inf.item\"]}"
+                }
+            }
+        }
+    },
+    "requirements": [
+        [
+            "display_right_clicked"
+        ]
+    ],
+    "rewards": {
+        "function": "siberia.inf:mechanics/bag_of_holding/room/unstore_item"
+    }
+}

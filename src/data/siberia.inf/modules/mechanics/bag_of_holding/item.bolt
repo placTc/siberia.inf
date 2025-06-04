@@ -44,6 +44,7 @@ def open_bag(player="@s"):
     
     database.get(player)
     execute as selector(player) run function TP_HELPER with storage db_name out.bag_coords
+    rotate selector(player) 0 0
     item replace entity selector(player) weapon.mainhand with air
 
     if DEBUG:

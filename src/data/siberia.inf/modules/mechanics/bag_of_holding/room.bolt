@@ -15,6 +15,37 @@ function f"{__name__}/tick":
     interaction_check(interactable_tag=EXIT_TAG, player_tag=PLAYER_TAG)
     execute as @a[tag=PLAYER_TAG] at @s:
         close_bag()
+    function f"{__name__}/make_item_display"
+
+
+function f"{__name__}/make_item_display":
+    display_helper = generate_helper_function_unique_name()
+    function display_helper:
+        $summon item_display ~ ~ ~ {item: $(Item), item_display: "ground", Rotation: $(Rotation)}
+        data modify entity @n[type=item_display] transformation.translation[2] set value -0.12
+        data modify entity @n[type=item_display] transformation.right_rotation set value [0.7071f,0,0,0.7071f]
+        summon interaction ~ ~ ~ {width: 0.25, height: 0.25, response: 1b, Tags: ["inf.item"]}
+
+    execute as @e[predicate=siberia.inf:boh_item_on_ground, tag=!inf.unstored, limit=1] at @s:
+        function display_helper with entity @s
+        kill @s
+
+function f"{__name__}/unstore_item":
+    itemize_helper = generate_helper_function_unique_name()
+    function itemize_helper:
+        $summon item ~ ~ ~ {Item: $(item), Tags: ["inf.unstored"]}
+        kill @n[type=item_display]
+        kill @s
+
+    interaction_helper = generate_helper_function_unique_name()
+    function interaction_helper:
+        a = "$execute as @e[nbt={interaction: {player: $(UUID)}}] at @s run function " + itemize_helper + " with entity @n[type=item_display]"
+        raw (a)
+    
+    execute as @p at @s:
+        debug_say("itemize!")
+        function interaction_helper with entity @s
+        advancement revoke @s only siberia.inf:mechanics/bag_of_holding/unstore_item
 
 place_helper = generate_helper_function_unique_name("place_helper")
 function place_helper:
