@@ -7,7 +7,7 @@ from ./common import DATABASE_NAME, close_bag, TP_HELPER
 from ./room import initialize_room
 
 function f"{__name__}/give":
-    give @p firework_star[
+    give @p poisonous_potato[
         custom_name=[{"text":"Bag of Holding","italic":false,"color":"white"}],
         lore=[
             [{"text":"A bag containing a soulbound","color":"gold"}],
@@ -29,7 +29,7 @@ def open_bag(player="@s"):
     debug_say("open bag")
     Scoreboard.objective("hod.bag_of_holding_open")[player] = 1
 
-    temp = Data.storage("sib.temp")
+    temp = Data.storage("hod.temp")
     database = UUIDEntryDatabase(DATABASE_NAME)
     player_data = Data.entity(player)
     db_name = database.database_name()

@@ -21,9 +21,7 @@ function f"{__name__}/tick":
 function f"{__name__}/make_item_display":
     display_helper = generate_helper_function_unique_name()
     function display_helper:
-        $summon item_display ~ ~ ~ {item: $(Item), item_display: "ground", Rotation: $(Rotation)}
-        data modify entity @n[type=item_display] transformation.translation[2] set value -0.12
-        data modify entity @n[type=item_display] transformation.right_rotation set value [0.7071f,0,0,0.7071f]
+        $summon item_display ~ ~ ~ {item: $(Item), item_display: "ground", Rotation: $(Rotation), transformation: {translation:[0f,0f,0f],left_rotation:[-0.707f,0f,0f,0.707f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
         summon interaction ~ ~ ~ {width: 0.25, height: 0.25, response: 1b, Tags: ["inf.item"]}
 
     execute as @e[predicate=hod:boh_item_on_ground, tag=!inf.unstored, limit=1] at @s:
@@ -55,7 +53,7 @@ def initialize_room(player="@s"):
     pid = Scoreboard.objective("hod.pid")[player]
     initialized = Scoreboard.objective("hod.bag_of_holding_initialized")[player]
     database = UUIDEntryDatabase(DATABASE_NAME)
-    temp = Data.storage("sib.temp")
+    temp = Data.storage("hod.temp")
 
     if initialized < 1:
         temp.z = pid * 10 + 4
@@ -64,5 +62,5 @@ def initialize_room(player="@s"):
         temp.z = pid * 10
         debug_say("placing")
         with ForceloadManager(0, 0, 0, pid * 10 + 4, "hod:bag_of_holding"):
-            function place_helper with storage sib.temp
+            function place_helper with storage hod.temp
         initialized = 1

@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
   "ingredients": [
     [
@@ -9,11 +9,25 @@
     "minecraft:sugar",
     "#minecraft:eggs"
   ],
+  "pattern": [
+    " s ",
+    "pep",
+    " w "
+  ],
+  "key": {
+    "p": [
+      "minecraft:carved_pumpkin",
+      "minecraft:pumpkin"
+    ],
+    "w": "minecraft:wheat",
+    "e": "#minecraft:eggs",
+    "s": "minecraft:sugar"
+  },
   "result": {
     "id": "minecraft:pumpkin_pie",
     "components": {
       "minecraft:food": {
-        "nutrition": 9,
+        "nutrition": 10,
         "saturation": 10,
         "can_always_eat": true
       },

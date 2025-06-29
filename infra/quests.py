@@ -1,10 +1,9 @@
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, model_validator, model_serializer
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Any, Self
 from uuid import uuid4
-from beet import Advancement, Context, Predicate
-from bolt_expressions import Data
+from beet import Context, Predicate
 
-from .infra import Announcement, ItemStack
+from .infra import Announcement
 
 SelfOpt = Self | None
 
@@ -19,29 +18,22 @@ class QuestGoal(BaseModel):
     to_complete: dict | None = Field(default=None, exclude=True) # Predicate
     to_fail: dict | None = Field(default=None, exclude=True) # Predicate
     time_to_complete: int | None = Field(default=None)
-    keep_in_questbook: bool = Field(default=False)
-    # next: SelfOpt = Field(default=None)
-    
-    complete: bool = Field(default=False)
-    failed: bool = Field(default=False)
     
     id: str = Field(default_factory=lambda: str(uuid4()))
     
 _quest_ids = set()
 
 class Quest(BaseModel):
-    
     id: str
     name: str
     description: str
-    individual: bool
-    standalone: bool
     goals: list[QuestGoal]
+    complete_goals: list[QuestGoal] = Field(default_factory=lambda: list())
     time_to_complete: int | None = Field(default=None)
-    on_begin: str | None = Field(default=None)
+    on_begin: str = Field(default="hod:_empty")
     on_complete: str | None = Field(default=None)
     on_cancel: str | None = Field(default=None)
-    next: SelfOpt = Field(default=None)
+    next: str = Field(default=None)
     
     complete: bool = Field(default=False)
     
@@ -50,13 +42,6 @@ class Quest(BaseModel):
             raise ValueError(f"Repeating quest ID {self.id}")
 
         _quest_ids.add(self.id)
-    
-    @model_validator(mode='after')
-    def validate_individual(self):
-        if self.individual and not self.standalone:
-            raise ValueError("Quest can't be both individual and part of a questline.")
-        
-        return self
     
     
 class QuestLine(BaseModel):
