@@ -1,0 +1,4 @@
+function f"{__name__}/grant":
+    effect give @s minecraft:strength 30 1
+    advancement revoke @s only hod:mechanics/other/pumpkin_pie_buff
+
