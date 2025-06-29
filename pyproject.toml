@@ -10,4 +10,5 @@ dependencies = [
     "bolt-expressions>=0.18.0",
     "mcbookshelf>=3.0.1",
     "nbtlib>=1.12.1",
+    "pydantic>=2.11.4",
 ]

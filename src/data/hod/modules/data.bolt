@@ -1,8 +1,8 @@
-function siberia.inf:entity_arbdata_add:
+function hod:entity_arbdata_add:
     $data modify entity $(entity) data merge value $(data)
 
-function siberia.inf:entity_arbdata_remove:
+function hod:entity_arbdata_remove:
     $data remove entity $(entity) data.$(key)
 
-function siberia.inf:entity_arbdata_modify:
+function hod:entity_arbdata_modify:
     $data modify entity $(entity) data.$(key) set value $(data)

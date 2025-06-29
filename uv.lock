@@ -160,6 +160,7 @@ dependencies = [
     { name = "bolt-expressions" },
     { name = "mcbookshelf" },
     { name = "nbtlib" },
+    { name = "pydantic" },
 ]
 
 [package.metadata]
@@ -169,6 +170,7 @@ requires-dist = [
     { name = "bolt-expressions", specifier = ">=0.18.0" },
     { name = "mcbookshelf", specifier = ">=3.0.1" },
     { name = "nbtlib", specifier = ">=1.12.1" },
+    { name = "pydantic", specifier = ">=2.11.4" },
 ]
 
 [[package]]

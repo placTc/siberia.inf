@@ -3,7 +3,7 @@
     "entity": "this",
     "predicate": {
       "location": {
-        "dimension": "siberia.inf:bag_of_holding"
+        "dimension": "hod:bag_of_holding"
       },
       "type": "minecraft:item",
       "flags": {

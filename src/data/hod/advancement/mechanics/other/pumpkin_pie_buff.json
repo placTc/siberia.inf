@@ -23,6 +23,6 @@
     ]
   ],
   "rewards": {
-    "function": "siberia.inf:mechanics/bag_of_holding/item/use"
+    "function": "hod:mechanics/bag_of_holding/item/use"
   }
 }

@@ -9,9 +9,9 @@ def selector(value):
 
 def generate_helper_function_unique_name(name="") -> str:
     if not name:
-        return f"siberia.inf:_helpers/{uuid4()}"
+        return f"hod:_helpers/{uuid4()}"
     else:
-        return f"siberia.inf:_helpers/{uuid4()}_{name}"
+        return f"hod:_helpers/{uuid4()}_{name}"
 
 def debug_say(txt):
     debug_mode = Scoreboard.objective("siberia.debug")

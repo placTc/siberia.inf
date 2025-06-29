@@ -3,7 +3,7 @@ from ../utils import selector, debug_say, generate_helper_function_unique_name
 from uuid import uuid4
 from bolt_expressions import Data
 
-INTERNAL_STORAGE_NAME = "siberia.inf:_flh"
+INTERNAL_STORAGE_NAME = "hod:_flh"
 
 forceload_helper = generate_helper_function_unique_name()
 function forceload_helper:

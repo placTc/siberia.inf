@@ -1,0 +1,132 @@
+from beet import Predicate
+from infra.quests import Quest, QuestGoal
+from bolt_expressions import Data, Scoreboard
+
+_quests = [
+    Quest(
+        id="test_quest",
+        name="Test Quest",
+        description="This is a test quest.",
+        individual=True,
+        standalone=True,
+        goals=[
+            QuestGoal(
+                description="Collect 50 log blocks",
+                to_complete={
+                    "condition": "minecraft:entity_properties",
+                    "range": 0,
+                    "entity": "this",
+                    "predicate": {
+                        "slots": {
+                            "container.*": {
+                                "items": "#minecraft:logs",
+                                "count": {
+                                    "min": 50
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        ],
+        on_begin="helper_test",
+        on_complete="helper_test"
+    )
+]
+
+function helper_test:
+    say QUEST HELPER
+
+def register_predicates(q: Quest):
+    for goal in q.goals:
+        if goal.to_complete:
+            ctx.data[f"{ctx.project_name}:{goal.id}_complete"] = Predicate(goal.to_complete)
+        if goal.to_fail:
+            ctx.data[f"{ctx.project_name}:{goal.id}_fail"] = Predicate(goal.to_fail)
+
+function f"{__name__}:load":
+    schedule clear f"{__name__}:check"
+    scoreboard objectives add hod.goal_complete dummy
+
+    quests_storage = Data.storage("hod:quests").all
+    quests_storage = {}
+
+    active_mock = Data.storage("hod:quests").active
+    active_mock = []
+
+    for _quest in _quests:
+        register_predicates(_quest)
+        quests_storage[_quest.id] = _quest.model_dump(mode='python', exclude_none=True)
+
+    for _quest in _quests:
+        active_mock.append(_quest.model_dump(mode='python', exclude_none=True))
+
+    function f"{__name__}:check"
+
+function f"{__name__}:activate":
+    active_quests = Data.storage("hod:quests").active
+
+function f"{__name__}:check":
+    active_quests = Data.storage("hod:quests").active
+    loop = Data.storage("inf:loop")
+
+    execute store result storage inf:loop quest int 1 run data get storage hod:quests active
+    loop["quest"] -= 1
+
+    function f"{__name__}:set_quest_complete":
+        $data modify storage hod:quests active[$(quest)].complete set value 1b 
+
+    function f"{__name__}:try_complete_quest":
+        function f"{__name__}:set_temp_quest"
+        if Data.storage("hod:quests").temp_quest.goals == []:
+            function f"{__name__}:set_quest_complete" with storage inf:loop
+
+
+    function f"{__name__}:check_quest_loop":
+        if loop["quest"] >= 0:
+            function f"{__name__}:check_goals"
+            function f"{__name__}:try_complete_quest"
+            loop["quest"] -= 1
+
+            function f"{__name__}:check_quest_loop"
+    
+    function f"{__name__}:check_quest_loop"
+    schedule function f"{__name__}:check" 1s append
+
+goal_complete = Scoreboard.objective("hod.goal_complete")["$hod.global"]
+quest_complete = Scoreboard.objective("hod.quest_complete")["$hod.global"]
+
+function f"{__name__}:check_goals":
+    function f"{__name__}:set_temp_quest"
+    loop = Data.storage("inf:loop")
+
+    execute store result storage inf:loop goal int 1 run data get storage hod:quests temp_quest.goals
+    loop["goal"] -= 1
+
+    function f"{__name__}:check_goal":
+        function f"{__name__}:check_goal_helper":
+            $execute as @a if predicate hod:$(id)_complete run scoreboard players set $hod.global hod.goal_complete 1
+
+        function f"{__name__}:complete_goal_helper":
+            $data modify storage hod:quests active[$(quest)].complete_goals append from storage hod:quests active[$(quest)].goals[$(goal)]
+            $data remove storage hod:quests active[$(quest)].goals[$(goal)]
+
+        $function f"{__name__}:check_goal_helper" with storage hod:quests temp_quest.goals[$(goal)]
+
+    if goal_complete == 1:
+        function f"{__name__}:complete_goal_helper" with storage inf:loop
+        goal_complete = 0
+
+    function f"{__name__}:check_goals_loop":
+        if loop["goal"] >= 0:
+            function f"{__name__}:check_goal" with storage inf:loop
+            loop["goal"] -= 1
+            function f"{__name__}:check_goals_loop" with storage inf:loop
+
+    function f"{__name__}:check_goals_loop"
+
+function f"{__name__}:set_temp_quest":
+    function f"{__name__}:set_temp_quest_helper":
+        $data modify storage hod:quests temp_quest set from storage hod:quests active[$(quest)]
+
+    function f"{__name__}:set_temp_quest_helper" with storage inf:loop

@@ -26,7 +26,7 @@ function f"{__name__}/make_item_display":
         data modify entity @n[type=item_display] transformation.right_rotation set value [0.7071f,0,0,0.7071f]
         summon interaction ~ ~ ~ {width: 0.25, height: 0.25, response: 1b, Tags: ["inf.item"]}
 
-    execute as @e[predicate=siberia.inf:boh_item_on_ground, tag=!inf.unstored, limit=1] at @s:
+    execute as @e[predicate=hod:boh_item_on_ground, tag=!inf.unstored, limit=1] at @s:
         function display_helper with entity @s
         kill @s
 
@@ -45,11 +45,11 @@ function f"{__name__}/unstore_item":
     execute as @p at @s:
         debug_say("itemize!")
         function interaction_helper with entity @s
-        advancement revoke @s only siberia.inf:mechanics/bag_of_holding/unstore_item
+        advancement revoke @s only hod:mechanics/bag_of_holding/unstore_item
 
 place_helper = generate_helper_function_unique_name("place_helper")
 function place_helper:
-    $execute in siberia.inf:bag_of_holding run place template siberia.inf:bag_of_holding 0 100 $(z) none none 1 0 strict
+    $execute in hod:bag_of_holding run place template hod:bag_of_holding 0 100 $(z) none none 1 0 strict
 
 def initialize_room(player="@s"):
     pid = Scoreboard.objective("siberia.pid")[player]
@@ -59,10 +59,10 @@ def initialize_room(player="@s"):
 
     if initialized < 1:
         temp.z = pid * 10 + 4
-        database.save_value(player, '{x: 4, y: 101, dim: "siberia.inf:bag_of_holding"}', "bag_coords")
+        database.save_value(player, '{x: 4, y: 101, dim: "hod:bag_of_holding"}', "bag_coords")
         database.save_from(player, temp.z, "bag_coords.z")
         temp.z = pid * 10
         debug_say("placing")
-        with ForceloadManager(0, 0, 0, pid * 10 + 4, "siberia.inf:bag_of_holding"):
+        with ForceloadManager(0, 0, 0, pid * 10 + 4, "hod:bag_of_holding"):
             function place_helper with storage sib.temp
         initialized = 1

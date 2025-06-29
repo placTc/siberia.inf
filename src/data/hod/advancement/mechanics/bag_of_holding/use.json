@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "used_bag": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "components": {
+            "minecraft:custom_data": {
+              "bag_of_holding": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "used_bag"
+    ]
+  ],
+  "rewards": {
+    "function": "hod:mechanics/bag_of_holding/item/use"
+  }
+}

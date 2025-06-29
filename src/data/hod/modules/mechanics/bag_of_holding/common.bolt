@@ -18,7 +18,7 @@ def close_bag(player="@s"):
         database.get(player)
         execute as selector(player):
             function TP_HELPER with storage db_name out.back_tp
-            schedule function siberia.inf:mechanics/bag_of_holding/item/give 1
+            schedule function hod:mechanics/bag_of_holding/item/give 1
 
         if DEBUG:
             gamemode creative

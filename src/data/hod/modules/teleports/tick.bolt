@@ -3,7 +3,7 @@ from ../tags import TELEPORT_TAG, IN_TELEPORT_TAG
 
 function f"{__name__}/_tick":
     interaction_check(interactable_tag=TELEPORT_TAG, player_tag=IN_TELEPORT_TAG)
-    function siberia.inf:teleports/particles/tick
-    function siberia.inf:teleports/actions/activate
-    function siberia.inf:teleports/actions/attempt_perform
-    function siberia.inf:teleports/actions/deactivate
+    function hod:teleports/particles/tick
+    function hod:teleports/actions/activate
+    function hod:teleports/actions/attempt_perform
+    function hod:teleports/actions/deactivate

@@ -1,4 +1,4 @@
-name: siberia.inf
+name: hod
 author: Team Siberia
 data_pack:
   load:
@@ -8,8 +8,9 @@ require:
   - bolt_expressions
 pipeline:
   - mecha
+  # - src.modules.make
 output: build
 meta:
   bolt:
     entrypoint:
-      - siberia.inf:root
+      - hod:root

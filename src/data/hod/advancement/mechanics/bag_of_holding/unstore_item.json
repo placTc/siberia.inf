@@ -16,6 +16,6 @@
         ]
     ],
     "rewards": {
-        "function": "siberia.inf:mechanics/bag_of_holding/room/unstore_item"
+        "function": "hod:mechanics/bag_of_holding/room/unstore_item"
     }
 }

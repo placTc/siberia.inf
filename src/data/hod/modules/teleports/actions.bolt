@@ -11,7 +11,7 @@ function f"{__name__}/tp_dimension":
 
 def schedule_announce(ticks):
     execute store result score @p siberia.announce run data get entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp.announce
-    schedule function siberia.inf:announcements/announce ticks append
+    schedule function hod:announcements/announce ticks append
 
 def schedule_sound(ticks):
     helper = generate_helper_function_unique_name()
@@ -65,6 +65,6 @@ function f"{__name__}/attempt_perform":
     execute as @a[tag=inf.in_teleport] at @s:
         debug_say("Teleport option detected")
     
-        if entity @n[predicate=siberia.inf:is_active_teleport, distance=..0.5, limit=1]:
-            tag @n[predicate=siberia.inf:is_active_teleport, distance=..0.5, limit=1] remove TELEPORT_ACTIVE_TAG
+        if entity @n[predicate=hod:is_active_teleport, distance=..0.5, limit=1]:
+            tag @n[predicate=hod:is_active_teleport, distance=..0.5, limit=1] remove TELEPORT_ACTIVE_TAG
             perform_teleport()

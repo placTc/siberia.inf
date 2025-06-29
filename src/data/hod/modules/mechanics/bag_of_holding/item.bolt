@@ -58,7 +58,7 @@ function f"{__name__}/use":
 
     revoke_helper = generate_helper_function_unique_name()
     function revoke_helper:
-        advancement revoke @p only siberia.inf:mechanics/bag_of_holding/use
+        advancement revoke @p only hod:mechanics/bag_of_holding/use
 
     execute as @p:
         if bag_of_holding_open == 0:
