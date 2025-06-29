@@ -4,15 +4,15 @@ from ../utils import selector, debug_say
 databases = set()
 
 def entry_macro(db_name):
-    a = (f"$execute unless data storage siberia.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}] run data modify storage siberia.ued:{db_name} entries append value {'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}")
+    a = (f"$execute unless data storage hod.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}] run data modify storage hod.ued:{db_name} entries append value {'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}")
     raw (a)
 
 def get_macro(db_name): 
-    a = (f"$data modify storage siberia.ued:{db_name} out set from storage siberia.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}]")
+    a = (f"$data modify storage hod.ued:{db_name} out set from storage hod.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}]")
     raw (a)
 
 def set_macro(db_name):
-    a = (f"$data modify storage siberia.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}] set from storage siberia.ued:{db_name} in")
+    a = (f"$data modify storage hod.ued:{db_name} entries[{'{UUID:[I;$(UUID0),$(UUID1),$(UUID2),$(UUID3)]}'}] set from storage hod.ued:{db_name} in")
     raw (a)
 
 def generate_macros(db_name):
@@ -37,7 +37,7 @@ class UUIDEntryDatabase:
 
     def _get_uuid(self, select):
         entity_uuid = Data.entity(select).UUID
-        storage = Data.storage(f"siberia.ued:{self.database}")
+        storage = Data.storage(f"hod.ued:{self.database}")
 
         storage.args["UUID0"] = entity_uuid[0]
         storage.args["UUID1"] = entity_uuid[1]
@@ -47,29 +47,29 @@ class UUIDEntryDatabase:
     def new_entry(self, select):
         debug_say(f"adding entry to database {self.database}")
         self._get_uuid(select)
-        function f"{__name__}/{self.database}/_new_entry_macro" with storage f"siberia.ued:{self.database}" args
+        function f"{__name__}/{self.database}/_new_entry_macro" with storage f"hod.ued:{self.database}" args
 
     def _save(self, select):
-        execute unless data storage f"siberia.ued:{self.database}" in.UUID run data modify storage f"siberia.ued:{self.database}" in.UUID set from entity selector(select) UUID
-        function f"{__name__}/{self.database}/_set_macro" with storage f"siberia.ued:{self.database}" args
+        execute unless data storage f"hod.ued:{self.database}" in.UUID run data modify storage f"hod.ued:{self.database}" in.UUID set from entity selector(select) UUID
+        function f"{__name__}/{self.database}/_set_macro" with storage f"hod.ued:{self.database}" args
 
     def save_value(self, select, data, location):
         debug_say(f"saving entry in database {self.database} data={data}")
         self._get_uuid(select)
-        raw (f"data modify storage siberia.ued:{self.database} in.{location} set value {data}")
+        raw (f"data modify storage hod.ued:{self.database} in.{location} set value {data}")
         self._save(select)
 
     def save_from(self, select, datasource, location):
         debug_say(f"saving entry in database {self.database} datasource={datasource}")
         self._get_uuid(select)
-        raw (f"data modify storage siberia.ued:{self.database} in.{location} set from {datasource}")
+        raw (f"data modify storage hod.ued:{self.database} in.{location} set from {datasource}")
         self._save(select)
 
     def get(self, select):
         debug_say(f"getting data from {select}")
         self._get_uuid(select)
-        function f"{__name__}/{self.database}/_get_macro" with storage f"siberia.ued:{self.database}" args
+        function f"{__name__}/{self.database}/_get_macro" with storage f"hod.ued:{self.database}" args
 
     def database_name(self):
-        return f"siberia.ued:{self.database}"
+        return f"hod.ued:{self.database}"
         

@@ -33,7 +33,7 @@ announcements = {
 
 function f"{__name__}/announce":
     execute as @p:
-        announcement = Scoreboard.objective("siberia.announce")
+        announcement = Scoreboard.objective("hod.announce")
         for scoreboard_value, func in announcements.items():
             if announcement["@s"] == scoreboard_value:
                 func()

@@ -14,8 +14,8 @@ def generate_helper_function_unique_name(name="") -> str:
         return f"hod:_helpers/{uuid4()}_{name}"
 
 def debug_say(txt):
-    debug_mode = Scoreboard.objective("siberia.debug")
+    debug_mode = Scoreboard.objective("hod.debug")
     if debug_mode["@p"]:
         tellraw @p [{text:"Debug >>> ",italic:true,color:"gray"},{text: txt, italic: false, color: "white"}]
 
-DEBUG = Scoreboard.objective("siberia.debug")["@s"]
+DEBUG = Scoreboard.objective("hod.debug")["@s"]

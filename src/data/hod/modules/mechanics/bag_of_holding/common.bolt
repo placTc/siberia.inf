@@ -9,7 +9,7 @@ function TP_HELPER:
     $execute in $(dim) run tp $(x) $(y) $(z)
 
 def close_bag(player="@s"):
-    bag_open_objective = Scoreboard.objective("siberia.bag_of_holding_open")[player]
+    bag_open_objective = Scoreboard.objective("hod.bag_of_holding_open")[player]
     if bag_open_objective:
         debug_say("close bag")
         bag_open_objective = 0

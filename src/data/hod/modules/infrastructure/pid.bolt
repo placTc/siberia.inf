@@ -1,6 +1,6 @@
 from bolt_expressions import Scoreboard
 
-pid = Scoreboard.objective("siberia.pid")
+pid = Scoreboard.objective("hod.pid")
 
 function f"{__name__}/load":
     if pid["$total"] == 0:
@@ -8,7 +8,7 @@ function f"{__name__}/load":
 
 function f"{__name__}/tick":
     pid["@a"] += 0
-    execute as @a[scores={siberia.pid=0}]:
+    execute as @a[scores={hod.pid=0}]:
         pid["@s"] = pid["$total"]
         pid["$total"] += 1
         

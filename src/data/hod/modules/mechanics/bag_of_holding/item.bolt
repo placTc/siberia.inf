@@ -27,7 +27,7 @@ function f"{__name__}/give":
 
 def open_bag(player="@s"):
     debug_say("open bag")
-    Scoreboard.objective("siberia.bag_of_holding_open")[player] = 1
+    Scoreboard.objective("hod.bag_of_holding_open")[player] = 1
 
     temp = Data.storage("sib.temp")
     database = UUIDEntryDatabase(DATABASE_NAME)
@@ -54,7 +54,7 @@ def open_bag(player="@s"):
 
 
 function f"{__name__}/use":
-    bag_of_holding_open = Scoreboard.objective("siberia.bag_of_holding_open")["@s"]
+    bag_of_holding_open = Scoreboard.objective("hod.bag_of_holding_open")["@s"]
 
     revoke_helper = generate_helper_function_unique_name()
     function revoke_helper:

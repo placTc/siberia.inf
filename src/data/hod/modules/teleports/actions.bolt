@@ -10,7 +10,7 @@ function f"{__name__}/tp_dimension":
     $execute in $(dimension) as @n[type=minecraft:player] run tp $(x) $(y) $(z)
 
 def schedule_announce(ticks):
-    execute store result score @p siberia.announce run data get entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp.announce
+    execute store result score @p hod.announce run data get entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp.announce
     schedule function hod:announcements/announce ticks append
 
 def schedule_sound(ticks):

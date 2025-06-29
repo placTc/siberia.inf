@@ -2,8 +2,8 @@ import ./item as item
 import ./room as room
 
 function f"{__name__}/load":
-    scoreboard objectives add siberia.bag_of_holding_initialized dummy
-    scoreboard players add @a siberia.bag_of_holding_initialized 0
-    scoreboard objectives add siberia.bag_of_holding_open dummy
-    scoreboard players add @a siberia.bag_of_holding_open 0
+    scoreboard objectives add hod.bag_of_holding_initialized dummy
+    scoreboard players add @a hod.bag_of_holding_initialized 0
+    scoreboard objectives add hod.bag_of_holding_open dummy
+    scoreboard players add @a hod.bag_of_holding_open 0
 
