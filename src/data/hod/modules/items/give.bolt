@@ -1,0 +1,14 @@
+from ../utils import selector
+
+function f"{__name__}/music_disc_underground":
+    give @p minecraft:poisonous_potato[
+        minecraft:custom_model_data={strings: ["music_disc_underground"]},
+        minecraft:jukebox_playable="hod:underground",
+        minecraft:item_name="Music Disc",
+        minecraft:rarity="uncommon",
+        minecraft:max_stack_size=1,
+        !food, !consumable
+    ]
+
+function f"{__name__}/bag_of_holding":
+    function hod:mechanics/bag_of_holding/item/give

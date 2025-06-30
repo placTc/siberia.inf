@@ -1,0 +1,11 @@
+{
+    "sound_event": {
+        "sound_id": "hod:music_disc.underground",
+        "range": 65
+    },
+    "description": {
+        "text": "Tom Waits - Underground"
+    },
+    "length_in_seconds": 119.0,
+    "comparator_output": 6
+}

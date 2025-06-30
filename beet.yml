@@ -3,6 +3,9 @@ author: Team Siberia
 data_pack:
   load:
     - src
+resource_pack:
+  load:
+    - src
 require:
   - bolt
   - bolt_expressions

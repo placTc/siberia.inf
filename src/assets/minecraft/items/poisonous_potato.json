@@ -1,0 +1,19 @@
+{
+    "model": {
+        "type": "select",
+        "property": "custom_model_data",
+        "fallback": {
+            "type": "model",
+            "model": "item/poisonous_potato"
+        },
+        "cases": [
+            {
+                "when": "music_disc_underground",
+                "model": {
+                    "type": "model",
+                    "model": "hod:item/music_disc_underground"
+                }
+            }
+        ]
+    }
+}

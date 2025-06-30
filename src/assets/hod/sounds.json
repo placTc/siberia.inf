@@ -1,0 +1,10 @@
+{
+    "music_disc.underground": {
+        "sounds": [
+            {
+                "name": "hod:music/music_disc_underground",
+                "stream": true
+            }
+        ]
+    }
+}

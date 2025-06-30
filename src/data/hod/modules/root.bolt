@@ -6,3 +6,4 @@ import ./teleports/root as teleports
 import ./mechanics/root as mechanics
 import ./infrastructure/root as infrastructure
 import ./interactions/root as interactions
+import ./items/root as items
