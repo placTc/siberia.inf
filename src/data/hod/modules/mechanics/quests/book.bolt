@@ -8,11 +8,10 @@ function f"{__name__}/give":
             pages: [
                 "asdf"
             ],
-            author: "Baré",
+            author: "§kBaré",
             title: {
                 raw: "Quest Book"
-            },
-            generation: 2
+            }
         }
     ]
 
