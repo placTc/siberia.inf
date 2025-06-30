@@ -1,0 +1,31 @@
+{
+    "variants": {
+        "": [
+            {
+                "model": "hod:block/divine_debris_block"
+            },
+            {
+                "model": "hod:block/divine_debris_block",
+                "y": 90
+            },
+            {
+                "model": "hod:block/divine_debris_block",
+                "y": 180
+            },
+            {
+                "model": "hod:block/divine_debris_block_mirrored"
+            },
+            {
+                "model": "hod:block/divine_debris_block_mirrored",
+                "y": 90
+            },
+            {
+                "model": "hod:block/divine_debris_block_mirrored",
+                "y": 180
+            }
+        ],
+        "test": {
+            "model": "minecraft:block/ancient_debris"
+        }
+    }
+}

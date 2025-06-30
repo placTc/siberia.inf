@@ -1,0 +1,17 @@
+{
+  "criteria": {
+    "used_book": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+      }
+    }
+  },
+  "requirements": [
+    [
+      "used_book"
+    ]
+  ],
+  "rewards": {
+    "function": "hod:mechanics/quests/book/update"
+  }
+}

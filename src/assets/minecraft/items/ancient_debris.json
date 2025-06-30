@@ -1,0 +1,19 @@
+{
+    "model": {
+        "type": "select",
+        "property": "custom_model_data",
+        "fallback": {
+            "type": "model",
+            "model": "hod:block/divine_debris_block"
+        },
+        "cases": [
+            {
+                "when": "default",
+                "model": {
+                    "type": "model",
+                    "model": "minecraft:block/ancient_debris"
+                }
+            }
+        ]
+    }
+}

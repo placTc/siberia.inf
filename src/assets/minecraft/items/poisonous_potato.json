@@ -13,6 +13,13 @@
                     "type": "model",
                     "model": "hod:item/music_disc_underground"
                 }
+            },
+            {
+                "when": "bag_of_holding",
+                "model": {
+                    "type": "model",
+                    "model": "hod:item/bag_of_holding"
+                }
             }
         ]
     }
