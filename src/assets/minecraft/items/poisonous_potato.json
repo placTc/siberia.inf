@@ -20,6 +20,34 @@
                     "type": "model",
                     "model": "hod:item/bag_of_holding"
                 }
+            },
+            {
+                "when": "pizza_0",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/0"
+                }
+            },
+            {
+                "when": "pizza_1",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/1"
+                }
+            },
+            {
+                "when": "pizza_2",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/2"
+                }
+            },
+            {
+                "when": "pizza_3",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/3"
+                }
             }
         ]
     }

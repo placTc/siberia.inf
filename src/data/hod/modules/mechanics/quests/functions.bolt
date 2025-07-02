@@ -11,6 +11,7 @@ _quests = [
         goals=[
             QuestGoal(
                 description="Collect 50 log blocks",
+                pre_check="hod:test_helper",
                 to_complete={
                     "condition": "minecraft:entity_properties",
                     "range": 0,
@@ -55,8 +56,54 @@ _quests = [
             )
         ],
         on_complete="hod:mechanics/quests/rewards/test_quest"
+    ),
+    Quest(
+        id="jump_quest",
+        name="Jump for us!",
+        description="This is a test quest.",
+        on_begin="hod:clear_jumps",
+        on_complete="hod:after_jumps",
+        goals=[
+            QuestGoal(
+                description="Jump 10 times",
+                pre_check="hod:everyone_jump_10_times_precheck",
+                to_complete=
+                    {
+                    "condition": "minecraft:value_check",
+                    "value": {
+                        "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$global"
+                        },
+                        "score": "jumps",
+                        "scale": 1
+                    },
+                    "range": {
+                        "min": 10
+                    }
+                    }
+            )
+        ]
     )
 ]
+
+function hod:clear_jumps:
+    scoreboard objectives add jumps minecraft.custom:minecraft.jump
+    scoreboard objectives setdisplay sidebar jumps
+    jumps = Scoreboard.objective("jumps")
+    execute as @a:
+        jumps["@s"] = 0
+
+
+function hod:everyone_jump_10_times_precheck:
+    jumps = Scoreboard.objective("jumps")
+    jumps["$global"] = 0
+    execute as @a:
+        jumps["$global"] += jumps["@s"]
+
+function hod:after_jumps:
+    scoreboard objectives remove jumps
 
 function hod:_empty:
     pass
@@ -75,11 +122,11 @@ function f"{__name__}/quest_begin":
     function helper:
         execute at @p playsound minecraft:entity.player.levelup neutral @a ~ ~ ~ 0.3 0.5
 
-    $title @a subtitle {"text":"$(name)"}
-    title @a title {"text":"New Quest!"}
+    $title @a subtitle {"text":"$(description)"}
+    $title @a title {"text":"New Quest - $(name)!"}
     schedule function helper 1t
 
-function helper_test:
+function hod:test_helper:
     say QUEST HELPER
 
 def register_predicates(q: Quest):
@@ -169,6 +216,7 @@ function f"{__name__}/check_goals":
 
     function f"{__name__}/check_goal":
         function f"{__name__}/check_goal_helper":
+            $function $(pre_check)
             $execute as @a if predicate hod:$(id)_complete run scoreboard players set $hod.global hod.goal_complete 1
 
         function f"{__name__}/complete_goal_helper":

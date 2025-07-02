@@ -7,6 +7,8 @@ from .infra import Announcement
 
 SelfOpt = Self | None
 
+EMPTY_FUNC = "hod:_empty"
+
 def make(ctx: Context):
     # ctx.data["hod:test"] = Advancement()
     ...    
@@ -15,6 +17,7 @@ class QuestGoal(BaseModel):
     model_config = ConfigDict()
     
     description: str
+    pre_check: str = Field(default=EMPTY_FUNC)
     to_complete: dict | None = Field(default=None, exclude=True) # Predicate
     to_fail: dict | None = Field(default=None, exclude=True) # Predicate
     time_to_complete: int | None = Field(default=None)
@@ -30,10 +33,10 @@ class Quest(BaseModel):
     goals: list[QuestGoal]
     complete_goals: list[QuestGoal] = Field(default_factory=lambda: list())
     time_to_complete: int | None = Field(default=None)
-    on_begin: str = Field(default="hod:_empty")
-    on_complete: str | None = Field(default=None)
-    on_cancel: str | None = Field(default=None)
-    next: str = Field(default=None)
+    on_begin: str = Field(default=EMPTY_FUNC)
+    on_complete: str = Field(default=EMPTY_FUNC)
+    on_cancel: str = Field(default=EMPTY_FUNC)
+    next: str | None = Field(default=None)
     
     complete: bool = Field(default=False)
     
