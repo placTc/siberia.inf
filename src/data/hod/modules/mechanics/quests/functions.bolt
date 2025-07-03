@@ -60,7 +60,7 @@ _quests = [
     Quest(
         id="jump_quest",
         name="Jump for us!",
-        description="This is a test quest.",
+        description="All the players have to jump 10 times total.",
         on_begin="hod:clear_jumps",
         on_complete="hod:after_jumps",
         goals=[

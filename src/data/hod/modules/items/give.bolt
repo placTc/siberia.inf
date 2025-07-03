@@ -13,6 +13,9 @@ def generate_music_disc(model_data, music_id):
 function f"{__name__}/music_disc_underground":
     generate_music_disc("music_disc_underground", "hod:underground")
 
+function f"{__name__}/music_disc_ghost_of_stephen_foster":
+    generate_music_disc("music_disc_ghost_of_stephen_foster", "hod:ghost_of_stephen_foster")
+
 function f"{__name__}/bag_of_holding":
     function hod:mechanics/bag_of_holding/item/give
 

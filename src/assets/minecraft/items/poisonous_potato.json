@@ -15,6 +15,13 @@
                 }
             },
             {
+                "when": "music_disc_ghost_of_stephen_foster",
+                "model": {
+                    "type": "model",
+                    "model": "hod:item/music_disc_ghost_of_stephen_foster"
+                }
+            },
+            {
                 "when": "bag_of_holding",
                 "model": {
                     "type": "model",

@@ -6,5 +6,13 @@
                 "stream": true
             }
         ]
+    },
+    "music_disc.ghost_of_stephen_foster": {
+        "sounds": [
+            {
+                "name": "hod:music/music_disc_ghost_of_stephen_foster",
+                "stream": true
+            }
+        ]
     }
 }

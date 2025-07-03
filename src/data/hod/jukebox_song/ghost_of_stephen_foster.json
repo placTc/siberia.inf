@@ -1,0 +1,11 @@
+{
+    "sound_event": {
+        "sound_id": "hod:music_disc.ghost_of_stephen_foster",
+        "range": 65
+    },
+    "description": {
+        "text": "Clyde McGee - Ghost of Stephen Foster"
+    },
+    "length_in_seconds": 159.0,
+    "comparator_output": 6
+}
