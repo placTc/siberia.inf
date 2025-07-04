@@ -6,7 +6,7 @@
         "item": {
           "components": {
             "minecraft:custom_data": {
-              "bag_of_holding": true
+              "hod:item": "hod:bag_of_holding"
             }
           }
         }

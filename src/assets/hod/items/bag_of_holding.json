@@ -1,6 +1,6 @@
 {
     "model": {
         "type": "model",
-        "model": "item/poisonous_potato"
+        "model": "hod:item/bag_of_holding"
     }
 }

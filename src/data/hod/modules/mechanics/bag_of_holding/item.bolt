@@ -23,7 +23,7 @@ function f"{__name__}/give":
         max_stack_size=1,
         tooltip_display={hidden_components:[unbreakable]},
         custom_data={"hod:item": "hod:bag_of_holding"},
-        custom_model_data={strings: ["bag_of_holding"]},
+        item_model="hod:bag_of_holding",
         !food
     ]
 

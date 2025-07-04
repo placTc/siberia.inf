@@ -1,0 +1,36 @@
+{
+    "model": {
+        "type": "select",
+        "property": "custom_model_data",
+        "cases": [
+            {
+                "when": "0",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/0"
+                }
+            },
+            {
+                "when": "1",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/1"
+                }
+            },
+            {
+                "when": "2",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/2"
+                }
+            },
+            {
+                "when": "3",
+                "model": {
+                    "type": "model",
+                    "model": "hod:block/pizza/3"
+                }
+            }
+        ]
+    }
+}

@@ -1,9 +1,9 @@
 from ../utils import selector
 
-def generate_music_disc(model_data, music_id):
+def generate_music_disc(model_data, music_id, item_name):
     give @p minecraft:poisonous_potato[
-        minecraft:custom_data={"hod:item": model_data},
-        minecraft:custom_model_data={strings: [model_data]},
+        minecraft:custom_data={"hod:item": item_name},
+        minecraft:item_model=model_data,
         minecraft:jukebox_playable=music_id,
         minecraft:item_name="Music Disc",
         minecraft:rarity="rare",
@@ -12,10 +12,10 @@ def generate_music_disc(model_data, music_id):
     ]
 
 function f"{__name__}/music_disc_underground":
-    generate_music_disc("music_disc_underground", "hod:underground")
+    generate_music_disc("hod:music_disc/underground", "hod:underground", "hod:music_disc_underground")
 
 function f"{__name__}/music_disc_ghost_of_stephen_foster":
-    generate_music_disc("music_disc_ghost_of_stephen_foster", "hod:ghost_of_stephen_foster")
+    generate_music_disc("hod:music_disc/ghost_of_stephen_foster", "hod:ghost_of_stephen_foster", "hod:music_disc_ghost_of_stephen_foster")
 
 function f"{__name__}/bag_of_holding":
     function hod:mechanics/bag_of_holding/item/give
@@ -24,7 +24,19 @@ function f"{__name__}/quest_book":
     function hod:mechanics/quests/book/give
 
 function f"{__name__}/pumpkin_pie":
-    give @p minecraft:pumpkin_pie[
-        minecraft:rarity="uncommon",
-        minecraft:food={nutrition:10,saturation:10,can_always_eat:1b}
+    give @p pumpkin_pie[
+        rarity=uncommon,
+        food={
+            nutrition:10,
+            saturation:10,
+            can_always_eat:1b
+        },
+        consumable={
+            on_consume_effects:[
+                {
+                    type:apply_effects,
+                    effects:[{id:strength,duration:600,amplifier:1}]
+                }
+            ]
+        }
     ]
