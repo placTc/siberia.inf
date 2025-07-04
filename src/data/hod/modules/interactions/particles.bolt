@@ -1,6 +1,6 @@
 from bolt_expressions import Data
 from ../utils import generate_helper_function_unique_name, selector
-from ../tags import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG, _not, BAG_OF_HOLDING_EXIT_TAG, HIDE_PARTICLES_TAG
+from ../tags import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG, _not, BAG_OF_HOLDING_EXIT_TAG, HIDE_PARTICLES_TAG, ACTIVE_CAULDRON_TAG
 
 def _active_teleport_particles():
     particle trial_spawner_detection ~ ~ ~ 0.125 1.7 0.125 0.0001 4 normal
@@ -15,16 +15,21 @@ def _permanent_teleport_particles():
     particle end_rod ~ ~1.25 ~ 0.1 1.2 0.1 0.002 1 normal
 
 def _bag_of_holding_exit_particles():
-
     particle enchanted_hit ~ ~1 ~ 0.235 1 0.235 0.01 1 normal
     # particle dust_color_transition{from_color:[0.0,0.0,0.0],to_color:[0.6,0.76,0.95],scale:1} ~ ~1 ~ 0.25 1 0.25 1 50 normal
     particle dust_color_transition{from_color:[0.0,0.0,0.0],to_color:[0,0,0],scale:1} ~ ~1 ~ 0.25 1 0.25 1 50 normal
+
+def _active_cauldron_particles():
+    execute positioned ~ ~1 ~ if predicate hod:half_the_time:
+        particle bubble_pop ~ ~ ~ 0.25 0.01 0.25 0.01 2 normal
+        particle ominous_spawning ~ ~ ~ 0.25 0.25 0.25 0.05 1 normal
 
 particles_for_tags = {
     (TELEPORT_ACTIVE_TAG,): _active_teleport_particles,
     (TELEPORT_TAG, _not(TELEPORT_ACTIVE_TAG), _not(PERMANENT_TELEPORT_TAG)): _inactive_teleport_particles,
     (PERMANENT_TELEPORT_TAG,): _permanent_teleport_particles,
-    (BAG_OF_HOLDING_EXIT_TAG,): _bag_of_holding_exit_particles
+    (BAG_OF_HOLDING_EXIT_TAG,): _bag_of_holding_exit_particles,
+    (ACTIVE_CAULDRON_TAG,): _active_cauldron_particles
 }
 
 # This, along with the application of `memo` in this module means that

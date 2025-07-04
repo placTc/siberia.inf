@@ -11,3 +11,5 @@ IN_TELEPORT_TAG = "inf.in_teleport"
 
 BAG_OF_HOLDING_EXIT_TAG = "inf.bag_of_holding_exit"
 IN_BAG_OF_HOLDING_EXIT_TAG = "inf.in_bag_of_holding_exit"
+
+ACTIVE_CAULDRON_TAG = "inf.active_cauldron"

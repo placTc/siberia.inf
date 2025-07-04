@@ -6,7 +6,7 @@
       "mainhand": {
         "components": {
           "minecraft:custom_data": {
-            "quest_book": true
+            "hod:item": "hod:quest_book"
           }
         }
       }

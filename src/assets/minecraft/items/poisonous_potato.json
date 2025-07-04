@@ -55,6 +55,13 @@
                     "type": "model",
                     "model": "hod:block/pizza/3"
                 }
+            },
+            {
+                "when": "blob",
+                "model": {
+                    "type": "model",
+                    "model": "hod:item/blob"
+                }
             }
         ]
     }

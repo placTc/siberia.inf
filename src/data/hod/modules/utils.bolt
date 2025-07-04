@@ -1,5 +1,5 @@
 from uuid import uuid4
-from bolt_expressions import Scoreboard
+from bolt_expressions import Scoreboard, Data
 from mecha import Mecha
 
 mc = ctx.inject(Mecha)
@@ -19,3 +19,10 @@ def debug_say(txt):
         tellraw @p [{text:"Debug >>> ",italic:true,color:"gray"},{text: txt, italic: false, color: "white"}]
 
 DEBUG = Scoreboard.objective("hod.debug")["@s"]
+
+def reduce_item_stack(select="@s", amount=1):
+    item_data = Data.entity(select)
+    if item_data.Item.count <= amount:
+        kill selector(select)
+    else:
+        item_data.Item.count -= amount

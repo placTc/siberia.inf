@@ -1,6 +1,6 @@
 from bolt_expressions import Data
 
-from ../utils import debug_say, generate_helper_function_unique_name, selector
+from ../utils import debug_say, generate_helper_function_unique_name, selector, reduce_item_stack
 from ../tags import TELEPORT_TAG, TELEPORT_ACTIVE_TAG, PERMANENT_TELEPORT_TAG
 
 ACTIVATOR = "minecraft:glowstone_dust"
@@ -31,13 +31,6 @@ def perform_teleport():
     schedule_sound(1)
     give_effects()
     function f"{__name__}/tp_dimension" with entity @n[tag=TELEPORT_TAG, distance=..0.5] data.tp
-    
-def reduce_item_stack(select="@s", amount=1):
-    item_data = Data.entity(select)
-    if item_data.Item.count <= amount:
-        kill selector(select)
-    else:
-        item_data.Item.count -= amount
 
 function f"{__name__}/activate":
     execute as @e[type=item, nbt={Item: {id: ACTIVATOR}}] at @s:

@@ -2,6 +2,7 @@ from ../utils import selector
 
 def generate_music_disc(model_data, music_id):
     give @p minecraft:poisonous_potato[
+        minecraft:custom_data={"hod:item": model_data},
         minecraft:custom_model_data={strings: [model_data]},
         minecraft:jukebox_playable=music_id,
         minecraft:item_name="Music Disc",

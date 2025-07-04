@@ -1,8 +1,9 @@
 from bolt_expressions import Scoreboard
 
 function f"{__name__}/give":
-    give @p minecraft:written_book[minecraft:custom_model_data={strings: ["quest_book"]},
-        minecraft:custom_data={quest_book: 1b},
+    give @p minecraft:written_book[
+        minecraft:custom_model_data={strings: ["quest_book"]},
+        minecraft:custom_data={"hod:item": "hod:quest_book"},
         minecraft:item_name="Quest Book",
         minecraft:written_book_content={
             pages: [
