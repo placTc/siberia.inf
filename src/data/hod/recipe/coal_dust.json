@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:smithing_transform",
+  "base": "#minecraft:coals",
+  "result": {
+    "id": "minecraft:poisonous_potato",
+    "components": {
+      "minecraft:item_name": "Coal Dust",
+      "!minecraft:food": {},
+      "minecraft:item_model": "hod:coal_dust",
+      "minecraft:custom_data": {
+        "hod:item": "hod:coal_dust"
+      },
+      "!minecraft:consumable": {}
+    }
+  }
+}

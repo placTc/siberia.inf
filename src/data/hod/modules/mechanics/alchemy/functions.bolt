@@ -1,17 +1,164 @@
 from ../../tags import ACTIVE_CAULDRON_TAG
-from ../../utils import reduce_item_stack
+from ../../utils import reduce_item_stack, generate_helper_function_unique_name, debug_say
+from pydantic import BaseModel
+from bolt_expressions import Data
+
+class PotionEffect(BaseModel):
+    id: str
+    amplifier: int
+    duration: int
+    ambient: bool = False
+    show_particles: bool = True
+    show_icon: bool = True
+
+class Potion(BaseModel):
+    debug: str = "a"
+    custom_color: int
+    custom_name: str
+    particle_color: list[float]
+    custom_effects: list[PotionEffect]
+
+
+recipes = {
+    ("minecraft:dirt",): Potion(
+        debug="mud pot",
+        custom_color=7427634,
+        particle_color=[0.44, 0.34, 0.2],
+        custom_name="muddy_water",
+        custom_effects=[
+            PotionEffect(id="minecraft:hunger", amplifier=0, duration=100),
+            PotionEffect(id="minecraft:nausea", amplifier=0, duration=200),
+            PotionEffect(id="minecraft:poison", amplifier=0, duration=50)
+        ],
+    ),
+    ("minecraft:blaze_rod", "minecraft:resin_clump"): Potion(
+        debug="flame pot",
+        custom_color=16750653,
+        particle_color=[1, 0.6, 0.24],
+        custom_name="flame_elixir",
+        custom_effects=[
+            PotionEffect(id="minecraft:fire_resistance", amplifier=1, duration=10000),
+            PotionEffect(id="minecraft:glowing", amplifier=1, duration=200),
+            PotionEffect(id="minecraft:nausea", amplifier=1, duration=100),
+        ],
+    ),
+    ("minecraft:warped_fungus", "minecraft:crimson_fungus", "minecraft:glow_berries"): Potion(
+        debug="rage pot",
+        custom_color=6370691,
+        particle_color=[0.38, 0.21, 0.51],
+        custom_name="rage_elixir",
+        custom_effects=[
+            PotionEffect(id="minecraft:strength", amplifier=1, duration=600),
+            PotionEffect(id="minecraft:speed", amplifier=0, duration=600),
+        ],
+    ),
+}
+
+murky_water = Potion(
+    debug="murky pot",
+    custom_color=6128266,
+    particle_color=[0.36, 0.51, 0.54],
+    custom_name="murky_water",
+    custom_effects=[],
+)
 
 def activate_cauldron():
-    summon marker ~ ~ ~ {Tags: [ACTIVE_CAULDRON_TAG], width: 0.5, height: 0.5}
+    summon marker ~ ~ ~ {Tags: [ACTIVE_CAULDRON_TAG], width: 0.5, height: 0.5, data: {"recipe": []}}
+    summon interaction ~ ~ ~ {Tags: [ACTIVE_CAULDRON_TAG], width: 1.01, height: 1.01}
     playsound minecraft:item.firecharge.use neutral @a ~ ~ ~
     particle small_flame ~ ~1 ~ 0.125 0.1 0.125 0.1 10 normal
     particle lava ~ ~1 ~ 0.125 0.1 0.125 0.05 10 normal
     reduce_item_stack()
 
-function f"{__name__}/tick":
+def deactivate_cauldron(with_ash):
+    if with_ash:
+        particle ash ~ ~1 ~ 0.2 0.2 0.2 0.1 100 normal
+        playsound minecraft:block.redstone_torch.burnout neutral @a ~ ~ ~ 0.7 2
+    kill @s
+    kill @n[type=interaction, tag=ACTIVE_CAULDRON_TAG]
+    reduce_item_stack("@n[type=item, distance=..0.5]")
+
+def check_cauldron_activation():
     execute as @e[type=item, predicate=hod:alchemy/activator_in_cauldron] at @s align xyz positioned ~0.5 ~ ~0.5:
         unless entity @e[distance=..0.5, type=marker, tag=ACTIVE_CAULDRON_TAG]:
             activate_cauldron()
+    
+def check_cauldron_state():
+    execute as @e[type=marker, tag=ACTIVE_CAULDRON_TAG] at @s:
+        if entity @e[type=item, predicate=hod:alchemy/deactivator, distance=..0.5, limit=1]:
+            deactivate_cauldron(True)
+        unless predicate hod:alchemy/in_any_cauldron:
+            deactivate_cauldron(False)
 
-    execute as @e[type=marker, tag=ACTIVE_CAULDRON_TAG] at @s unless predicate hod:alchemy/in_any_cauldron:
-        kill @s
+def check_current_recipe():
+    execute as @e[type=marker, tag=ACTIVE_CAULDRON_TAG] at @s:
+        for recipe, result in recipes.items(): 
+            if Data.entity("@s").data.recipe == list(recipe):
+                particle entity_effect{color: [*result.particle_color, 1.0]} ~ ~1 ~ 0.125 0.75 0.125 0.1 1 normal
+
+def check_item_addition():
+    execute as @e[type=marker, tag=ACTIVE_CAULDRON_TAG] at @s:
+        if entity @n[type=item, distance=..0.5]:
+            dataloc = Data.storage("hod:temp").recipe_addition 
+            if Data.entity("@n[type=item, distance=..0.5]").Item.components["minecraft:custom_data"]["hod:item"]:
+                dataloc = Data.entity("@n[type=item, distance=..0.5]").Item.components["minecraft:custom_data"]["hod:item"]
+            else:
+                dataloc = Data.entity("@n[type=item, distance=..0.5]").Item.id
+            if not dataloc == "minecraft:fire_charge":
+                Data.entity("@s").data.recipe.append(Data.storage("hod:temp").recipe_addition)
+                reduce_item_stack("@n[type=item, distance=..0.5]")
+                playsound minecraft:item.firecharge.use neutral @a ~ ~ ~
+                particle small_flame ~ ~1 ~ 0.125 0.1 0.125 0.1 10 normal
+                particle lava ~ ~1 ~ 0.125 0.1 0.125 0.05 10 normal
+            
+function f"{__name__}/tick":
+    check_cauldron_activation()
+    check_cauldron_state()
+    check_item_addition()
+    check_current_recipe()
+
+function f"{__name__}/brew":
+    selector = f"@n[type=marker, tag={ACTIVE_CAULDRON_TAG}]"
+    potion_storage = Data.storage("hod:temp").potion
+    recipe_storage = Data.entity(selector).data.recipe
+    brew_helper = generate_helper_function_unique_name()
+    function brew_helper:
+        debug_say("starting brew attempt")
+        for recipe, result in recipes.items(): 
+            if recipe_storage == list(recipe):
+                potion_storage = result.model_dump()
+        if potion_storage == {}:
+            potion_storage = murky_water.model_dump()
+        execute at @s if block ~ ~ ~ water_cauldron[level=1]:
+            setblock ~ ~ ~ cauldron replace
+        execute at @s if block ~ ~ ~ water_cauldron[level=2]:
+            setblock ~ ~ ~ water_cauldron[level=1] replace
+        execute at @s if block ~ ~ ~ water_cauldron[level=3]:
+            setblock ~ ~ ~ water_cauldron[level=2] replace
+
+                
+
+    interaction_helper = generate_helper_function_unique_name()
+    function interaction_helper:
+        a = "$execute as @e[nbt={interaction: {player: $(UUID), timestamp: $(time)L}}] at @s run function " + brew_helper
+        raw (a)
+        
+    give_helper = generate_helper_function_unique_name()
+    function give_helper:
+        a = "$give @s potion[minecraft:potion_contents=$(potion)]"
+        raw (a)
+    
+    execute as @p at @s:
+        advancement revoke @s only hod:mechanics/alchemy/brew_potion
+        data modify storage hod:temp UUID set from entity @s UUID
+        execute store result storage hod:temp time long 1 run time query gametime
+        debug_say("stored values")
+        function interaction_helper with storage hod:temp
+        if not Data.storage("hod:temp").potion == {}:
+            function give_helper with storage hod:temp
+            item modify entity @s weapon.mainhand hod:remove_one
+            Data.storage("hod:temp").potion = {}
+
+
+
+    

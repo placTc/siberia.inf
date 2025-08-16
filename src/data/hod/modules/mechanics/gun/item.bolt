@@ -1,0 +1,51 @@
+from bolt_expressions import Data, Scoreboard
+
+function f"{__name__}/give":
+    give @p poisonous_potato[
+        custom_name=[{"text":"Gun","italic":false,"color":"white"}],
+        consumable={
+            consume_seconds:1000000,
+            animation:eat,
+            sound:"block.wool.step",
+            has_consume_particles:0b
+        },
+        max_stack_size=1,
+        tooltip_display={hidden_components:[unbreakable]},
+        custom_data={"hod:item": "hod:gun"},
+        item_model="hod:gun",
+        !food
+    ]
+
+function f"{__name__}/use":
+    scoreboard objectives add MotionX dummy
+    scoreboard objectives add MotionY dummy
+    scoreboard objectives add MotionZ dummy
+
+    summon minecraft:marker ^ ^ ^10 {Tags:["aim"]}
+    execute anchored eyes run summon minecraft:arrow ^ ^ ^ {Tags:["aimed"], damage: 5, life: 1100}
+
+    motion_x = Scoreboard.objective("MotionX")["$temp"]
+    motion_y = Scoreboard.objective("MotionY")["$temp"]
+    motion_z = Scoreboard.objective("MotionZ")["$temp"]
+
+    motion_x = (Data.entity("@n[tag=aim]").Pos[0] * 1000) - (Data.entity("@s").Pos[0] * 1000)
+    # if motion_x < 0:
+    #     motion_x = -1 * motion_x
+    motion_y = (Data.entity("@n[tag=aim]").Pos[1] * 1000) - (Data.entity("@s").Pos[1] * 1000)
+    # if motion_y < 0:
+    #     motion_y = -1 * motion_y
+    motion_z = (Data.entity("@n[tag=aim]").Pos[2] * 1000) - (Data.entity("@s").Pos[2] * 1000)
+    # if motion_z < 0:
+    #     motion_z = -1 * motion_z
+
+    Data.entity("@n[tag=aimed]").Motion[0] = Scoreboard.objective("MotionX")["$temp"] / 1000
+    Data.entity("@n[tag=aimed]").Motion[1] = Scoreboard.objective("MotionY")["$temp"] / 1000
+    Data.entity("@n[tag=aimed]").Motion[2] = Scoreboard.objective("MotionZ")["$temp"] / 1000
+    Data.entity("@n[tag=aimed]").Rotation = Data.entity("@s").Rotation
+
+    kill @e[tag=aim]
+
+    function f"{__name__}/revoke_helper":
+        advancement revoke @p only hod:mechanics/gun/use
+
+    schedule function f"{__name__}/revoke_helper" 1s

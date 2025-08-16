@@ -1,4 +1,4 @@
-from bolt_expressions import Scoreboard
+from bolt_expressions import Scoreboard, Data
 
 function f"{__name__}/give":
     give @p minecraft:written_book[
@@ -17,6 +17,10 @@ function f"{__name__}/give":
     ]
 
 function f"{__name__}/update":
+    book_base = Data.storage("hod:quest_book").base
+
+    memo a=1:
+        book_base.pages = []
     say update mock
 
 
@@ -27,3 +31,7 @@ function f"{__name__}/detect_open_book":
             if predicate hod:holding_quest_book:
                 function f"{__name__}/update"
             opened_book = 0
+
+    
+
+

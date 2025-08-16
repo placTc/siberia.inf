@@ -2,3 +2,4 @@ import ./bag_of_holding/root as bag_of_holding
 import ./other/root as other
 import ./quests/root as quests
 import ./alchemy/root as alchemy
+import ./gun/root as gun

@@ -5,10 +5,7 @@
     "nbt": "{Item: {id: \"minecraft:fire_charge\"}}",
     "location": {
       "block": {
-        "blocks": "minecraft:water_cauldron",
-        "state": {
-          "level": "3"
-        }
+        "blocks": "minecraft:water_cauldron"
       }
     }
   }

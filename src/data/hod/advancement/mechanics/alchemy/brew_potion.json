@@ -1,0 +1,28 @@
+{
+  "criteria": {
+    "cauldron_right_clicked": {
+      "trigger": "minecraft:player_interacted_with_entity",
+      "conditions": {
+        "player": {
+          "equipment": {
+            "mainhand": {
+              "items": "minecraft:glass_bottle"
+            }
+          }
+        },
+        "entity": {
+          "type": "minecraft:interaction",
+          "nbt": "{Tags: [\"inf.active_cauldron\"]}"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "cauldron_right_clicked"
+    ]
+  ],
+  "rewards": {
+    "function": "hod:mechanics/alchemy/functions/brew"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "used_gun": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "components": {
+            "minecraft:custom_data": {
+              "hod:item": "hod:gun"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "used_gun"
+    ]
+  ],
+  "rewards": {
+    "function": "hod:mechanics/gun/item/use"
+  }
+}
