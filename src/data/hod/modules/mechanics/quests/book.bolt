@@ -1,37 +1,71 @@
 from bolt_expressions import Scoreboard, Data
+from ../../utils import generate_helper_function_unique_name
+from ../../triggers/triggered_function import tfunc, tfunc_score
+from uuid import uuid4
 
 function f"{__name__}/give":
-    give @p minecraft:written_book[
-        minecraft:custom_model_data={strings: ["quest_book"]},
-        minecraft:custom_data={"hod:item": "hod:quest_book"},
-        minecraft:item_name="Quest Book",
-        minecraft:written_book_content={
-            pages: [
-                "asdf"
-            ],
-            author: "§kBaré",
-            title: {
-                raw: "Quest Book"
-            }
-        }
+    give @p minecraft:poisonous_potato[
+        minecraft:item_model="hod:journal",
+        minecraft:custom_data={"hod:item": "hod:journal"},
+        minecraft:item_name="Journal",
+        consumable={
+            consume_seconds:100000,
+            animation:none,
+            has_consume_particles:0b
+        },
+        !food
     ]
+    
 
-function f"{__name__}/update":
-    book_base = Data.storage("hod:quest_book").base
-
-    memo a=1:
-        book_base.pages = []
+def update_journal():
     say update mock
 
+def journal_dialog():
+    dialog show @s {
+        type:"minecraft:confirmation",
+        title:"This is a dialog test",
+        body:{type:"minecraft:plain_message",
+        contents:"Dialog Test!"},
+        can_close_with_escape:1b,
+        pause:0b,
+        after_action:"close",
+        yes:{
+            label:"YEa",
+            action:{
+                type: "minecraft:run_command",
+                command: f"trigger {tfunc_score(f'{__name__}/restore_book_ability')}"
+            }
+        },
+        no:{
+            label:"NAH",
+            action:{
+                type: "minecraft:run_command",
+                command: f"trigger {tfunc_score(f'{__name__}/restore_book_ability')}"
+            }
+        }
+    }
 
-function f"{__name__}/detect_open_book":
-    execute as @a:
-        opened_book = Scoreboard.objective("hod.open_book")["@s"]
-        if opened_book > 0:
-            if predicate hod:holding_quest_book:
-                function f"{__name__}/update"
-            opened_book = 0
+function f"{__name__}/open_book_trigger":
+    trigger tfunc_score(f"{__name__}/open_book")
 
-    
+tag = str(uuid4())
+tfunc f"{__name__}/restore_book_ability_on_join":
+    execute as @p at @s:
+        advancement revoke @s only hod:mechanics/quests/use_questbook
+        tag @s remove tag
+
+tfunc f"{__name__}/restore_book_ability":
+    scheduled = generate_helper_function_unique_name()
+    function scheduled:
+        execute as @p[tag=tag] at @s:
+            advancement revoke @s only hod:mechanics/quests/use_questbook
+            tag @s remove tag
+
+    tag @s add tag
+    schedule function scheduled 2t
+
+tfunc f"{__name__}/open_book":
+    update_journal()
+    journal_dialog()
 
 

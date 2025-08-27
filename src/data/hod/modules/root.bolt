@@ -1,3 +1,4 @@
+from bolt_expressions import Scoreboard
 import ./announcements as announcements
 import ./data as data
 import ./tags as tags
@@ -7,3 +8,36 @@ import ./mechanics/root as mechanics
 import ./infrastructure/root as infrastructure
 import ./interactions/root as interactions
 import ./items/root as items
+
+from ./triggers/triggered_function import generate_trigger_scoreboards, generate_trigger_tickers, tfunc
+
+tfunc hod:trigger_test:
+    say hi!
+
+function hod:tick:
+    function hod:teleports/tick/_tick
+    function hod:infrastructure/pid/tick
+    function hod:interactions/particles/tick
+    function hod:mechanics/bag_of_holding/room/tick
+    function hod:mechanics/alchemy/functions/tick
+    generate_trigger_tickers()
+    
+    # Execute when player just joins the world
+    execute as @p[scores={hod.left=1..}]:
+        Scoreboard.objective("hod.left")["@s"] = 0
+        schedule function hod:mechanics/quests/book/restore_book_ability_on_join 1s
+
+function hod:load:
+    scoreboard objectives add hod.left minecraft.custom:minecraft.leave_game
+    scoreboard players add * hod.left 1
+    scoreboard objectives add hod.announce dummy
+    scoreboard objectives add hod.debug dummy
+    scoreboard objectives add hod.pid dummy
+    scoreboard objectives remove hod.open_book
+    scoreboard objectives add hod.open_book trigger
+    scoreboard players enable @a hod.open_book
+    scoreboard players add $total hod.pid 0
+    function hod:infrastructure/pid/load
+    function hod:mechanics/bag_of_holding/root/load
+    schedule function hod:mechanics/quests/functions/load 1s
+    generate_trigger_scoreboards()

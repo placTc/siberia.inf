@@ -12,6 +12,7 @@ def generate_helper_function_unique_name(name="") -> str:
         return f"hod:_helpers/{uuid4()}"
     else:
         return f"hod:_helpers/{uuid4()}_{name}"
+        
 
 def debug_say(txt):
     debug_mode = Scoreboard.objective("hod.debug")

@@ -63,41 +63,39 @@ murky_water = Potion(
 )
 
 def activate_cauldron():
-    summon marker ~ ~ ~ {Tags: [ACTIVE_CAULDRON_TAG], width: 0.5, height: 0.5, data: {"recipe": []}}
-    summon interaction ~ ~ ~ {Tags: [ACTIVE_CAULDRON_TAG], width: 1.01, height: 1.01}
+    summon interaction ~ ~ ~ {Tags: [ACTIVE_CAULDRON_TAG], width: 1.01, height: 1.01, data: {"recipe": []}}
     playsound minecraft:item.firecharge.use neutral @a ~ ~ ~
     particle small_flame ~ ~1 ~ 0.125 0.1 0.125 0.1 10 normal
     particle lava ~ ~1 ~ 0.125 0.1 0.125 0.05 10 normal
-    reduce_item_stack()
+    reduce_item_stack("@s")
 
 def deactivate_cauldron(with_ash):
     if with_ash:
         particle ash ~ ~1 ~ 0.2 0.2 0.2 0.1 100 normal
         playsound minecraft:block.redstone_torch.burnout neutral @a ~ ~ ~ 0.7 2
     kill @s
-    kill @n[type=interaction, tag=ACTIVE_CAULDRON_TAG]
-    reduce_item_stack("@n[type=item, distance=..0.5]")
+    reduce_item_stack("@n[type=item, distance=..0.5, predicate=hod:alchemy/deactivator]")
 
 def check_cauldron_activation():
     execute as @e[type=item, predicate=hod:alchemy/activator_in_cauldron] at @s align xyz positioned ~0.5 ~ ~0.5:
-        unless entity @e[distance=..0.5, type=marker, tag=ACTIVE_CAULDRON_TAG]:
+        unless entity @e[distance=..0.5, type=interaction, tag=ACTIVE_CAULDRON_TAG]:
             activate_cauldron()
     
 def check_cauldron_state():
-    execute as @e[type=marker, tag=ACTIVE_CAULDRON_TAG] at @s:
-        if entity @e[type=item, predicate=hod:alchemy/deactivator, distance=..0.5, limit=1]:
+    execute as @e[type=interaction, tag=ACTIVE_CAULDRON_TAG] at @s:
+        if entity @n[type=item, predicate=hod:alchemy/deactivator, distance=..0.5]:
             deactivate_cauldron(True)
         unless predicate hod:alchemy/in_any_cauldron:
             deactivate_cauldron(False)
 
 def check_current_recipe():
-    execute as @e[type=marker, tag=ACTIVE_CAULDRON_TAG] at @s:
+    execute as @e[type=interaction, tag=ACTIVE_CAULDRON_TAG] at @s:
         for recipe, result in recipes.items(): 
             if Data.entity("@s").data.recipe == list(recipe):
-                particle entity_effect{color: [*result.particle_color, 1.0]} ~ ~1 ~ 0.125 0.75 0.125 0.1 1 normal
+                return run particle entity_effect{color: [*result.particle_color, 1.0]} ~ ~1 ~ 0.125 0.75 0.125 0.1 1 normal
 
 def check_item_addition():
-    execute as @e[type=marker, tag=ACTIVE_CAULDRON_TAG] at @s:
+    execute as @e[type=interaction, tag=ACTIVE_CAULDRON_TAG] at @s:
         if entity @n[type=item, distance=..0.5]:
             dataloc = Data.storage("hod:temp").recipe_addition 
             if Data.entity("@n[type=item, distance=..0.5]").Item.components["minecraft:custom_data"]["hod:item"]:
@@ -107,10 +105,10 @@ def check_item_addition():
             if not dataloc == "minecraft:fire_charge":
                 Data.entity("@s").data.recipe.append(Data.storage("hod:temp").recipe_addition)
                 reduce_item_stack("@n[type=item, distance=..0.5]")
-                playsound minecraft:item.firecharge.use neutral @a ~ ~ ~
-                particle small_flame ~ ~1 ~ 0.125 0.1 0.125 0.1 10 normal
-                particle lava ~ ~1 ~ 0.125 0.1 0.125 0.05 10 normal
-            
+                playsound ambient.underwater.exit neutral @a ~ ~ ~ 1 1.5
+                particle falling_water ~ ~1 ~ 0.2 0.1 0.2 1 25 normal
+                particle small_flame ~ ~1 ~ 0.125 0.1 0.125 0.05 10 normal
+                
 function f"{__name__}/tick":
     check_cauldron_activation()
     check_cauldron_state()
@@ -118,7 +116,7 @@ function f"{__name__}/tick":
     check_current_recipe()
 
 function f"{__name__}/brew":
-    selector = f"@n[type=marker, tag={ACTIVE_CAULDRON_TAG}]"
+    selector = f"@n[type=interaction, tag={ACTIVE_CAULDRON_TAG}, distance=..8]"
     potion_storage = Data.storage("hod:temp").potion
     recipe_storage = Data.entity(selector).data.recipe
     brew_helper = generate_helper_function_unique_name()
@@ -156,9 +154,7 @@ function f"{__name__}/brew":
         function interaction_helper with storage hod:temp
         if not Data.storage("hod:temp").potion == {}:
             function give_helper with storage hod:temp
+            playsound minecraft:block.brewing_stand.brew neutral @a ~ ~ ~ 1 1.25
+            playsound minecraft:item.bottle.fill neutral @a ~ ~ ~
             item modify entity @s weapon.mainhand hod:remove_one
             Data.storage("hod:temp").potion = {}
-
-
-
-    

@@ -1,4 +1,8 @@
 {
+    "item.minecraft.potion.effect.murky_water": "Murky Water",
+    "item.minecraft.potion.effect.rage_elixir": "Elixir of Rage",
+    "item.minecraft.potion.effect.flame_elixir": "Elixir of Flame",
+
     "item.minecraft.netherite_ingot": "Divinite Alloy",
     "item.minecraft.netherite_scrap": "Divinite Plate",
     "block.minecraft.ancient_debris": "Divine Debris"

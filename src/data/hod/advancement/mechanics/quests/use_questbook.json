@@ -3,6 +3,13 @@
     "used_book": {
       "trigger": "minecraft:using_item",
       "conditions": {
+        "item": {
+          "components": {
+            "minecraft:custom_data": {
+              "hod:item": "hod:journal"
+            }
+          }
+        }
       }
     }
   },
@@ -12,6 +19,6 @@
     ]
   ],
   "rewards": {
-    "function": "hod:mechanics/quests/book/update"
+    "function": "hod:mechanics/quests/book/open_book_trigger"
   }
 }

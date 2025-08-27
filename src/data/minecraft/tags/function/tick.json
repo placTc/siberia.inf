@@ -1,10 +1,5 @@
 {
     "values": [
-        "hod:teleports/tick/_tick",
-        "hod:infrastructure/pid/tick",
-        "hod:interactions/particles/tick",
-        "hod:mechanics/bag_of_holding/room/tick",
-        "hod:mechanics/quests/book/detect_open_book",
-        "hod:mechanics/alchemy/functions/tick"
+        "hod:tick"
     ]
 }
