@@ -2,8 +2,19 @@
     "item.minecraft.potion.effect.murky_water": "Murky Water",
     "item.minecraft.potion.effect.rage_elixir": "Elixir of Rage",
     "item.minecraft.potion.effect.flame_elixir": "Elixir of Flame",
+    "item.minecraft.potion.effect.garum": "Garum",
 
-    "item.minecraft.netherite_ingot": "Divinite Alloy",
-    "item.minecraft.netherite_scrap": "Divinite Plate",
+    "item.minecraft.netherite_ingot": "Diinsmetal Ingot",
+    "item.minecraft.netherite_scrap": "Divine Derivate",
+    "block.minecraft.netherite_block": "Diinsmetal Block",
+    "item.minecraft.netherite_pickaxe": "Diinsmetal Pixace",
+    "item.minecraft.netherite_shovel": "Diinsmetal Shovel",
+    "item.minecraft.netherite_axe": "Diinsmetal Axe",
+    "item.minecraft.netherite_hoe": "Diinsmetal Hoe",
+    "item.minecraft.netherite_sword": "Diinsmetal Sword",
+    "item.minecraft.netherite_chestplate": "Diinsmetal Chestplate",
+    "item.minecraft.netherite_leggings": "Diinsmetal Leggings",
+    "item.minecraft.netherite_helmet": "Diinsmetal Helmet",
+    "item.minecraft.netherite_boots": "Diinsmetal Boots",
     "block.minecraft.ancient_debris": "Divine Debris"
 }

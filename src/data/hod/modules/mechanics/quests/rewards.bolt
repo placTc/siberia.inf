@@ -1,2 +1,3 @@
 function f"{__name__}/test_quest":
     give @a minecraft:pumpkin_pie
+    function hod:after_jumps

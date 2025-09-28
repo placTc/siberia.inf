@@ -16,34 +16,33 @@ function f"{__name__}/give":
         !food
     ]
     
-
 def update_journal():
-    say update mock
+    temp_text = Data.storage("hod:temp").text
+    dialogs = Data.storage("hod:dialogs")
 
-def journal_dialog():
-    dialog show @s {
-        type:"minecraft:confirmation",
-        title:"This is a dialog test",
-        body:{type:"minecraft:plain_message",
-        contents:"Dialog Test!"},
-        can_close_with_escape:1b,
-        pause:0b,
-        after_action:"close",
-        yes:{
-            label:"YEa",
-            action:{
-                type: "minecraft:run_command",
-                command: f"trigger {tfunc_score(f'{__name__}/restore_book_ability')}"
-            }
-        },
-        no:{
-            label:"NAH",
-            action:{
-                type: "minecraft:run_command",
-                command: f"trigger {tfunc_score(f'{__name__}/restore_book_ability')}"
-            }
-        }
-    }
+    summon minecraft:text_display ~ ~ ~ {text_opacity:0, background:0, text:{selector:"@p",extra:["'s Journal"]}}
+    dialogs.journal.title = Data.entity("@n[type=text_display, distance=..1]").text
+    kill @n[type=minecraft:text_display, distance=..1]
+
+    text_display = Data.entity("@n[type=text_display, distance=..0.5]")
+    summon minecraft:text_display ~ ~ ~ {text_opacity:0, background:0, text:{selector:"@p"}}
+    text_display.remove("text.click_event")
+    text_display.remove("text.hover_event")
+    temp_text.resolved = text_display.text
+    kill @n[type=minecraft:text_display, distance=..1]
+    temp_text.intermediate = {text: "This is the body for ", extra: []}
+    temp_text.intermediate.extra.append(temp_text.resolved)
+    temp_text.intermediate.extra.append("'s Journal")
+    dialogs.journal.body.contents = temp_text.intermediate
+
+function f"{__name__}/notes_dialog_inf":
+    $dialog show @s $(notes)
+
+function f"{__name__}/journal_dialog_inf":
+    $dialog show @s $(journal)
+
+function f"{__name__}/quests_dialog_inf":
+    $dialog show @s $(quests)
 
 function f"{__name__}/open_book_trigger":
     trigger tfunc_score(f"{__name__}/open_book")
@@ -62,10 +61,252 @@ tfunc f"{__name__}/restore_book_ability":
             tag @s remove tag
 
     tag @s add tag
-    schedule function scheduled 2t
+    dialog clear @s
+    schedule function scheduled 5t
 
 tfunc f"{__name__}/open_book":
     update_journal()
-    journal_dialog()
+    function f"{__name__}/journal_dialog_inf" with storage hod:dialogs
+
+function f"{__name__}/load_journal_dialogs":
+    Data.storage("hod:dialogs").quests = {
+        type:"minecraft:notice",
+        title: "Active Quests",
+        body:{
+            type:"minecraft:plain_message",
+            contents: "No currently active quests.",
+            width: 512
+        },
+        can_close_with_escape:true,
+        pause:false,
+        after_action:"none",
+        action:{
+            label:"Back",
+            action:{
+                type:"minecraft:run_command",
+                command: f"trigger {tfunc_score(f"{__name__}/open_book")}"
+            },
+            width: 100
+        }
+    }
+
+    Data.storage("hod:dialogs").notes = {
+        type:"minecraft:notice",
+        title: "Notes",
+        body:{
+            type:"minecraft:plain_message",
+            contents: "No notes.",
+            width: 512
+        },
+        can_close_with_escape:true,
+        pause:false,
+        after_action:"none",
+        action:{
+            label:"Back",
+            action:{
+                type:"minecraft:run_command",
+                command: f"trigger {tfunc_score(f"{__name__}/open_book")}"
+            },
+            width: 100
+        }
+    }
+
+    Data.storage("hod:dialogs").journal = {
+        type:"minecraft:multi_action",
+        body:{
+            type:"minecraft:plain_message",
+        },
+        can_close_with_escape:true,
+        pause:false,
+        after_action:"none",
+        exit_action:{
+            label:"Close",
+            action:{
+                type:"minecraft:run_command",
+                command: f"trigger {tfunc_score(f"{__name__}/restore_book_ability")}"
+            },
+            width: 100
+        },
+        actions:[
+            {
+                label:"Active Quests",
+                action: {
+                    type: "minecraft:run_command",
+                    command: f"trigger {tfunc_score(f"{__name__}/quests_dialog")}"
+                },
+                width: 200
+            },
+            {
+                label:"Notes",
+                action: {
+                    type: "minecraft:run_command",
+                    command: f"trigger {tfunc_score(f"{__name__}/notes_dialog")}"
+                },
+                width: 200
+            }
+        ],
+        columns: 1
+    }
 
 
+function f"{__name__}/update_notes":
+    notes_storage = Data.storage("hod:notes").notes
+    iterator = Data.storage("inf:loop").note
+    first = Data.storage("hod:temp").first
+    first = True
+    iterator = len(notes_storage) - 1
+    temp_text = Data.storage("hod:temp").text
+    temp_text.intermediate = {text: "", extra: []}
+    dialogs = Data.storage("hod:dialogs")
+
+    append_current = generate_helper_function_unique_name()
+    function append_current:
+        $data modify storage hod:temp text.intermediate.extra append from storage hod:notes notes[$(note)] 
+
+    function f"{__name__}/update_notes_internal":
+        if iterator >= 0:
+            first = False
+            temp_text.intermediate.extra.append("∙ ")
+            function append_current with storage inf:loop
+            data modify storage hod:temp text.intermediate.extra append value "\n"
+            iterator -= 1
+            function f"{__name__}/update_notes_internal"
+        elif first == True:
+            temp_text.intermediate = {text: "No notes."}
+
+    function f"{__name__}/update_notes_internal"
+    dialogs.notes.body.contents = temp_text.intermediate
+
+temp = Data.storage("hod:temp")
+loop = Data.storage("inf:loop")
+
+get_goals_helper = generate_helper_function_unique_name()
+print(get_goals_helper)
+function get_goals_helper:
+    $execute store result storage inf:loop jgoal int 1 run data get storage hod:quests active[$(jquest)].$(array)
+    loop.jgoal -= 1
+
+starter_helper = generate_helper_function_unique_name()
+function starter_helper:
+    $data modify storage hod:temp text.temp.hover_event.value.extra append value $(starter)
+
+goal_helper = generate_helper_function_unique_name()
+function goal_helper:
+    data modify storage hod:temp text.temp.hover_event.value.extra append value "\n"
+    function starter_helper with storage hod:temp text
+    data modify storage hod:temp text.temp.hover_event.value.extra append value " "
+    $data modify storage hod:temp text.temp.hover_event.value.extra append from storage hod:quests active[$(jquest)].$(array)[$(jgoal)].description
+
+goal_iterator = generate_helper_function_unique_name()
+function goal_iterator:
+    loop.array = "goals"
+    temp_text.starter = {text: "☐"}
+    function get_goals_helper with storage inf:loop
+    helper = generate_helper_function_unique_name()
+    function helper:
+        if loop.jgoal >= 0:
+            function goal_helper with storage inf:loop
+            loop.jgoal -= 1
+            function helper
+    function helper
+
+    
+complete_goal_iterator = generate_helper_function_unique_name()
+function complete_goal_iterator:
+    loop.array = "complete_goals"
+    temp_text.starter = {text: "☑", color: "green"}
+    function get_goals_helper with storage inf:loop
+    helper = generate_helper_function_unique_name()
+    function helper:
+        if loop.jgoal >= 0:
+            function goal_helper with storage inf:loop
+            loop.jgoal -= 1
+            function helper
+    function helper
+
+function f"{__name__}/update_quests":
+    quests = Data.storage("hod:quests").active
+    loop = Data.storage("inf:loop")
+    first = Data.storage("hod:temp").first
+    first = True
+    loop.jquest = len(quests) - 1
+    temp_text = Data.storage("hod:temp").text
+    temp_text.intermediate = {text: "", extra: []}
+    dialogs = Data.storage("hod:dialogs")
+
+    text_form_helper = generate_helper_function_unique_name()
+    function text_form_helper:
+        data modify storage hod:temp text.temp set value {underlined:1b}
+        $data modify storage hod:temp text.temp.text set from storage hod:quests active[$(jquest)].name
+        data modify storage hod:temp text.temp.hover_event set value {}
+        data modify storage hod:temp text.temp.hover_event.action set value "show_text"
+        data modify storage hod:temp text.temp.hover_event.value set value {}
+        $data modify storage hod:temp text.temp.hover_event.value.text set from storage hod:quests active[$(jquest)].description
+        data modify storage hod:temp text.temp.hover_event.value.extra set value ["\nGoals:"]
+        function goal_iterator
+        function complete_goal_iterator
+
+    function f"{__name__}/update_quests_internal":
+        if loop.jquest >= 0:
+            first = False
+            temp_text.intermediate.extra.append("║ ")
+            Data.storage("hod:temp").first_run = True
+            function text_form_helper with storage inf:loop
+            data modify storage hod:temp text.intermediate.extra append from storage hod:temp text.temp
+            data modify storage hod:temp text.intermediate.extra append value " ║ \n"
+            if loop.jquest != 0:
+                data modify storage hod:temp text.intermediate.extra append value "\n"
+            loop.jquest -= 1
+            function f"{__name__}/update_quests_internal"
+        elif first == True:
+            temp_text.intermediate = {text: "Nothing to do right now."}
+
+    function f"{__name__}/update_quests_internal"
+    dialogs.quests.body.contents = temp_text.intermediate
+
+# function f"{__name__}/update_quests2":
+#     quests = Data.storage("hod:quests").active
+#     loop = Data.storage("inf:loop")
+#     loop.journal_quest = len(quests) - 1
+#     first = Data.storage("hod:temp").first
+#     first = True
+#     temp_text = Data.storage("hod:temp").text
+#     temp_text.intermediate = []
+#     dialogs = Data.storage("hod:dialogs")
+
+#     text_form_helper = generate_helper_function_unique_name()
+#     function text_form_helper:
+#         $say $(journal_quest)
+#         data modify storage hod:temp text.temp set value {label: {}}
+#         $data modify storage hod:temp text.temp.label.text set from storage hod:quests active[$(journal_quest)].name
+#         data modify storage hod:temp text.temp.label.hover_event set value {}
+#         data modify storage hod:temp text.temp.label.hover_event.action set value "show_text"
+#         data modify storage hod:temp text.temp.label.hover_event.value set value {}
+#         $data modify storage hod:temp text.temp.label.hover_event.value.text set from storage hod:quests active[$(journal_quest)].description
+
+#     function f"{__name__}/update_quests_internal2":
+#         if loop.journal_quest >= 0:
+#             first = False
+#             # temp_text.intermediate.extra.append("∙ ")
+#             print(text_form_helper)
+#             function text_form_helper with storage inf:loop
+#             data modify storage hod:temp text.intermediate append from storage hod:temp text.temp
+#             # data modify storage hod:temp text.intermediate append value "\n"
+#             loop.journal_quest -= 1
+#             function f"{__name__}/update_quests_internal2"
+#         elif first == True:
+#             dialogs.quests.body.contents = {text: "Nothing to do right now."}
+#             dialogs.quests.type = "minecraft:notice"
+#         elif first == False:
+#             dialogs.quests.type = "minecraft:multi_action"
+#             dialogs.quests.actions = temp_text.intermediate
+
+#     function f"{__name__}/update_quests_internal2"
+
+tfunc f"{__name__}/quests_dialog":
+    function f"{__name__}/update_quests"
+    function f"{__name__}/quests_dialog_inf" with storage hod:dialogs
+
+tfunc f"{__name__}/notes_dialog":
+    function f"{__name__}/update_notes"
+    function f"{__name__}/notes_dialog_inf" with storage hod:dialogs

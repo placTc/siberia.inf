@@ -1,6 +1,8 @@
 from uuid import uuid4
 from bolt_expressions import Scoreboard, Data
 from mecha import Mecha
+import inspect
+from contextlib import contextmanager
 
 mc = ctx.inject(Mecha)
 
@@ -27,3 +29,4 @@ def reduce_item_stack(select="@s", amount=1):
         kill selector(select)
     else:
         item_data.Item.count -= amount
+

@@ -1,3 +1,4 @@
-import ./functions as f
-import ./rewards as r
-import ./book as b
+import ./functions as functions
+import ./rewards as rewards
+import ./book as book
+import ./quest_functions as quest_functions

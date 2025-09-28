@@ -38,7 +38,6 @@ def open_bag(player="@s"):
 
     initialize_room()
 
-
     database.save_from(player, player_data.Pos[0], location="back_tp.x")
     database.save_from(player, player_data.Pos[1], location="back_tp.y")
     database.save_from(player, player_data.Pos[2], location="back_tp.z")

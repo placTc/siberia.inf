@@ -1,0 +1,20 @@
+from bolt_expressions import Scoreboard, Data
+
+function hod:clear_jumps:
+    scoreboard objectives add jumps minecraft.custom:minecraft.jump
+    scoreboard objectives setdisplay sidebar jumps
+    jumps = Scoreboard.objective("jumps")
+    execute as @a:
+        jumps["@s"] = 0
+
+function hod:everyone_jump_10_times_precheck:
+    jumps = Scoreboard.objective("jumps")
+    jumps["$global"] = 0
+    execute as @a:
+        jumps["$global"] += jumps["@s"]
+
+function hod:after_jumps:
+    scoreboard objectives remove jumps
+
+function hod:_empty:
+    pass

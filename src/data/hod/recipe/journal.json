@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:feather",
+    "minecraft:book",
+    "minecraft:ink_sac",
+    "minecraft:iron_nugget"
+  ],
+  "result": {
+    "id": "minecraft:poisonous_potato",
+    "components": {
+      "minecraft:item_name": "Journal",
+      "!minecraft:food": {},
+      "minecraft:item_model": "hod:journal",
+      "minecraft:custom_data": {
+        "hod:item": "hod:journal"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:consumable": {
+        "consume_seconds": 100000,
+        "animation": "none",
+        "has_consume_particles": false
+      }
+    }
+  }
+}

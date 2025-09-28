@@ -1,0 +1,107 @@
+from infra.quests import Quest, QuestGoal
+
+_quests = [
+    Quest(
+        id="test_quest",
+        name="Test Quest",
+        description="This our quintissential test quest!",
+        on_begin="hod:clear_jumps",
+        goals=[
+            QuestGoal(
+                description="Collect 50 log blocks",
+                pre_check="hod:test_helper",
+                to_complete={
+                    "condition": "minecraft:entity_properties",
+                    "range": 0,
+                    "entity": "this",
+                    "predicate": {
+                        "slots": {
+                            "container.*": {
+                                "items": "#minecraft:logs",
+                                "count": {
+                                    "min": 50
+                                }
+                            }
+                        }
+                    }
+                }
+            ),
+            QuestGoal(
+                description="Jump 10 times",
+                pre_check="hod:everyone_jump_10_times_precheck",
+                to_complete=
+                    {
+                        "condition": "minecraft:value_check",
+                        "value": {
+                            "type": "minecraft:score",
+                            "target": {
+                                "type": "minecraft:fixed",
+                                "name": "$global"
+                            },
+                            "score": "jumps",
+                            "scale": 1
+                        },
+                        "range": {
+                            "min": 10
+                        }
+                    }
+            )
+        ],
+        on_complete="hod:mechanics/quests/rewards/test_quest"
+    ),
+    Quest(
+        id="pie_quest",
+        name="Pie Quest",
+        description="This is a test quest.",
+        goals=[
+            QuestGoal(
+                description="Collect 50 pumpkin pies",
+                to_complete={
+                    "condition": "minecraft:entity_properties",
+                    "range": 0,
+                    "entity": "this",
+                    "predicate": {
+                        "slots": {
+                            "container.*": {
+                                "items": "minecraft:pumpkin_pie",
+                                "count": {
+                                    "min": 50
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        ],
+        on_complete="hod:mechanics/quests/rewards/test_quest"
+    ),
+    Quest(
+        id="jump_quest",
+        name="Jump for us!",
+        description="All the players have to jump 10 times total.",
+        on_begin="hod:clear_jumps",
+        on_complete="hod:after_jumps",
+        goals=[
+            QuestGoal(
+                description="Jump 10 times",
+                pre_check="hod:everyone_jump_10_times_precheck",
+                to_complete=
+                    {
+                        "condition": "minecraft:value_check",
+                        "value": {
+                            "type": "minecraft:score",
+                            "target": {
+                                "type": "minecraft:fixed",
+                                "name": "$global"
+                            },
+                            "score": "jumps",
+                            "scale": 1
+                        },
+                        "range": {
+                            "min": 10
+                        }
+                    }
+            )
+        ]
+    )
+]
