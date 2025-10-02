@@ -9,6 +9,10 @@ resource_pack:
 require:
   - bolt
   - bolt_expressions
+  - bookshelf.module.hitbox
+  - bookshelf.module.move
+  - bookshelf.module.vector
+  - bookshelf.module.link
 pipeline:
   - mecha
   # - src.modules.make

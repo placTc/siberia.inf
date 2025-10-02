@@ -1,0 +1,259 @@
+from bolt_expressions import Data, Scoreboard
+from contextlib import contextmanager
+from ../utils import selector, generate_helper_function_unique_name, debug_say
+from ../funcmacros/ticking_function import ticker
+
+DOPAK_TAG = "hod.boss.dopak"
+DOPAK_INTERACTION_TAG = "hod.boss.dopak.interaction"
+DOPAK_MINION_TAG = "hod.boss.dopak.minion"
+DOPAK_FIREBALL_TAG = "hod.boss.dopak.fireball"
+DOPAK_FIREBALL_REDIRECTED_TAG = "hod.boss.dopak.fireball.redirected"
+DOPAK_MINION_FIREBALL_TAG = "hod.boss.dopak.minion.fireball"
+DOPAK_FIREBALL_FIRED_TAG = "hod.boss.dopak.fireball.fired"
+DOPAK_FIREBALL_ROTATING_TAG = "hod.boss.dopak.fireball.rotating"
+DOPAK_MARKER_TAG = "hod.boss.dopak.marker"
+SPEED_LIMIT = 800
+GHAST_SCALE = 1.75
+INTERACTION_PADDING = 1
+
+dopak_base_data = Data.entity("@n[tag=hod.boss.dopak]")
+dopak_data = Data.entity("@n[tag=hod.boss.dopak]").data
+_in = Scoreboard("hod.in")
+_out = Scoreboard("hod.out")
+
+function f"{__name__}/summon_interaction":
+    execute as @n[type=ghast, tag=DOPAK_TAG]:
+        size = 4 * GHAST_SCALE + (INTERACTION_PADDING * 2)
+        summon minecraft:interaction ~ ~ ~ {
+            width: size,
+            height: size,
+            Tags: [DOPAK_INTERACTION_TAG]
+        }
+
+function f"{__name__}/summon":
+    summon minecraft:ghast ~ ~ ~ {
+        CustomName: "Döpak",
+        CustomNameVisible: 0b,
+        PersistenceRequired: 1b,
+        NoAI: 0b,
+        Invulnerable: 1b,
+        Health: 250.0f,
+        attributes: [
+            {id: "max_health", base: 250.0f},
+            {id: "scale", base: GHAST_SCALE},
+            {id: "movement_speed", base: 0.35f}
+        ],
+        Tags: [DOPAK_TAG],
+        data: {
+            dash_amount: 0.0f,
+            dash: 0,
+            dashing: False
+        }
+    }
+
+    function f"{__name__}/summon_interaction"
+
+    # summon minecraft:marker 100 100 100 {
+    #     Tags: [DOPAK_MARKER_TAG]
+    # }
+
+ticker f"{__name__}/link_interaction_position":
+    execute as @n[tag=DOPAK_INTERACTION_TAG] at @s
+        if entity @n[tag=DOPAK_TAG]:
+            tp @n[tag=DOPAK_TAG]
+            execute at @s:
+                raw (f"tp ~ ~-{INTERACTION_PADDING} ~")
+        unless entity @n[tag=DOPAK_TAG]:
+            kill @s
+
+function f"{__name__}/bossbar":
+    ...
+
+def toggle_control():
+    ai = Data.entity(f"@n[tag={DOPAK_TAG}]").NoAI
+    if ai:
+        ai = False
+    else:
+        ai = True
+
+def target_entity(select):
+    rotate @n[tag=DOPAK_TAG] facing entity select
+
+function f"{__name__}/dash":
+    dopak_data.dash += 1
+    execute as @n[tag=DOPAK_TAG] at @s:
+        if function #bs.hitbox:is_entity_in_blocks_collision:
+            kill @e[type=interaction, tag=DOPAK_INTERACTION_TAG]
+            dopak_base_data.Invulnerable = False
+            dopak_data.dash_amount = 0.0
+            dopak_data.dash = 0
+            dopak_data.dashing = False
+            schedule clear f"{__name__}/dash"
+            tp ~ ~2 ~
+            scoreboard objectives remove hod.dopak.dash
+            dopak_base_data.NoAI = False
+            playsound minecraft:item.mace.smash_ground_heavy hostile @p ~ ~ ~
+            particle gust ~ ~1 ~ 2 0.2 2 0.01 100 normal
+            particle campfire_signal_smoke ~ ~1 ~ 2 0.2 2 0.01 100 normal
+            execute as @a[distance=..5]:
+                debug_say("Ouch!")
+                damage @s 10 minecraft:falling_anvil by @n[tag=hod.boss.dopak]
+            schedule function f"{__name__}/invulnerable" 2s
+
+        unless function #bs.hitbox:is_entity_in_blocks_collision:
+            if dopak_data.dashing == True:
+                dopak_base_data.NoAI = True
+                Scoreboard("bs.vel.x")["@s"] = 0
+                Scoreboard("bs.vel.y")["@s"] = 0
+                if dopak_data.dash < SPEED_LIMIT:
+                    Scoreboard("bs.vel.z")["@s"] = Data.cast(dopak_data.dash * dopak_data.dash * 5, "float")
+                else:
+                    Scoreboard("bs.vel.z")["@s"] = Data.cast(SPEED_LIMIT, "float")
+
+                execute rotated as @s run function #bs.move:local_to_canonical
+                function #bs.move:apply_vel {scale:0.001,with:{on_collision: "#bs.move:callback/stick"}}
+                schedule function f"{__name__}/dash" 1t
+
+function f"{__name__}/invulnerable":
+    dopak_base_data.Invulnerable = True
+    function f"{__name__}/summon_interaction"
+
+function f"{__name__}/dash_attack":
+    dash_helper = generate_helper_function_unique_name()
+    function dash_helper:
+        execute as @n[tag=DOPAK_TAG] at @s:
+            dopak_data.dashing = True
+            function f"{__name__}/dash"
+
+    toggle_control()
+    target_entity(selector("@r"))
+    execute at @n[tag=DOPAK_TAG]:
+        playsound minecraft:entity.ghast.warn hostile @p ~ ~ ~ 10 0.9
+
+    schedule function dash_helper 5t
+    
+@contextmanager
+def helper_entity():
+    summon marker ~ ~ ~ {Tags: ["utility"]}
+    yield selector("@n[type=marker, tag=utility]")
+    kill @e[type=marker, tag=utility]
+
+function f"{__name__}/summon_little_ghast":
+    summon minecraft:ghast ~ ~ ~ {
+        CustomName: "Döpak Minion",
+        PersistenceRequired: 1b,
+        Health: 5.0f,
+        attributes: [
+            {id: "max_health", base: 5.0f},
+            {id: "scale", base: 0.33f},
+            {id: "movement_speed", base: 0.95f}
+        ],
+        Tags: [DOPAK_MINION_TAG],
+        ExplosionPower: 0,
+        DeathLootTable: ""
+    }
+
+rotation_helper = generate_helper_function_unique_name()
+function rotation_helper:
+    $rotate @s $(yaw) $(pitch)
+
+def random_rotate_above(selector):
+    execute store result storage hod:temp rotation.yaw int 1 run random value -180..180
+    execute store result storage hod:temp rotation.pitch int 1 run random value -90..0
+    execute as selector:
+        function rotation_helper with storage hod:temp rotation
+
+function f"{__name__}/summon_minion":
+    execute as @s at @s:
+        with helper_entity() as sel:
+            random_rotate_above(sel)
+            execute as sel at @s positioned ^ ^ ^8:
+                function f"{__name__}/summon_little_ghast"
+                particle dust_color_transition{from_color:[0.37,0.36,0.39],to_color:[1.0,1.0,1.0],scale:1} ~ ~1 ~ 0.5 0.75 0.5 0.001 700
+
+
+function f"{__name__}/minion_attack":
+    execute as @n[tag=hod.boss.dopak]:
+        function f"{__name__}/summon_minion"
+        function f"{__name__}/summon_minion"
+        execute store result score $random hod.in run random value 1..4
+        if _in["$random"] > 2:
+            function f"{__name__}/summon_minion"
+        if _in["$random"] == 4:
+            function f"{__name__}/summon_minion"
+        playsound minecraft:block.dried_ghast.transition hostile @p ~ ~ ~ 2 0.9
+
+ticker f"{__name__}/new_fireball_fired":
+    execute as @e[type=fireball, nbt={Fire:0s}, tag=!DOPAK_FIREBALL_TAG]:
+        if Data.entity("@s").Owner == Data.entity(f"@n[tag={DOPAK_TAG}]").UUID:
+            tag @s add DOPAK_FIREBALL_TAG
+
+    execute as @e[type=fireball, nbt={Fire:0s}, tag=!DOPAK_MINION_FIREBALL_TAG]:
+        if Data.entity("@s").Owner == Data.entity(f"@n[tag={DOPAK_MINION_TAG}]").UUID:
+            tag @s add DOPAK_MINION_FIREBALL_TAG
+
+ticker f"{__name__}/set_fireball_owner":
+    execute as @e[type=fireball, tag=DOPAK_FIREBALL_TAG]:
+        if not (Data.entity("@s").Owner == Data.entity(f"@n[tag={DOPAK_TAG}]").UUID):
+            debug_say("found fireball with wrong owner")
+            Data.storage("hod:temp").owner = Data.entity("@s").Owner
+            Data.entity("@s").data.Redictor = Data.entity("@s").Owner
+            Data.entity("@s").Owner = Data.entity(f"@n[tag={DOPAK_TAG}]").UUID
+            tag @s add DOPAK_FIREBALL_REDIRECTED_TAG
+
+    execute as @e[type=fireball, tag=DOPAK_MINION_FIREBALL_TAG]:
+        if not (Data.entity("@s").Owner == Data.entity(f"@n[tag={DOPAK_MINION_TAG}]").UUID):
+            debug_say("found fireball with wrong owner")
+            Data.entity("@s").data.Redictor = Data.entity("@s").Owner
+            Data.entity("@s").Owner = Data.entity(f"@n[tag={DOPAK_MINION_TAG}]").UUID
+            tag @s add DOPAK_FIREBALL_REDIRECTED_TAG
+
+
+# Make two additional fireballs by each side of the original one.
+# The caret notation coordinates and the rotation degrees have opposite sign
+# because the fireball starts out facing the ghast on its first tick.
+function f"{__name__}/split_fireball":
+    execute at @s:
+        summon fireball ^-1 ^ ^ {Tags: [DOPAK_FIREBALL_ROTATING_TAG, DOPAK_FIREBALL_TAG, DOPAK_FIREBALL_FIRED_TAG]}
+        Scoreboard("hod.in")["$rotation"] = 15
+        Data.entity(f"@n[tag={DOPAK_FIREBALL_ROTATING_TAG}]").Motion = Data.entity("@s").Motion
+        Data.entity(f"@n[tag={DOPAK_FIREBALL_ROTATING_TAG}]").Owner = Data.entity(f"@n[tag={DOPAK_TAG}]").UUID
+        function f"{__name__}/rotate_fireball"
+
+        summon fireball ^1 ^ ^ {Tags: [DOPAK_FIREBALL_ROTATING_TAG, DOPAK_FIREBALL_TAG, DOPAK_FIREBALL_FIRED_TAG]}
+        Scoreboard("hod.in")["$rotation"] = -15
+        Data.entity(f"@n[tag={DOPAK_FIREBALL_ROTATING_TAG}]").Motion = Data.entity("@s").Motion
+        Data.entity(f"@n[tag={DOPAK_FIREBALL_ROTATING_TAG}]").Owner = Data.entity(f"@n[tag={DOPAK_TAG}]").UUID
+        function f"{__name__}/rotate_fireball"
+
+SCALE = 1000
+
+function f"{__name__}/rotate_fireball":
+    execute as @e[type=fireball, limit=1, tag=DOPAK_FIREBALL_ROTATING_TAG]:
+        execute store result score $vector.cartesian_to_spherical.0 bs.in run data get entity @n[type=minecraft:fireball] Motion[0] SCALE
+        execute store result score $vector.cartesian_to_spherical.1 bs.in run data get entity @n[type=minecraft:fireball] Motion[1] SCALE
+        execute store result score $vector.cartesian_to_spherical.2 bs.in run data get entity @n[type=minecraft:fireball] Motion[2] SCALE
+        function #bs.vector:cartesian_to_spherical {scaling:SCALE}
+        Scoreboard("bs.in")["$vector.spherical_to_cartesian.0"] = Scoreboard("bs.out")["$vector.cartesian_to_spherical.0"] + (Scoreboard("hod.in")["$rotation"] * SCALE)
+        Scoreboard("bs.in")["$vector.spherical_to_cartesian.1"] = Scoreboard("bs.out")["$vector.cartesian_to_spherical.1"]
+        Scoreboard("bs.in")["$vector.spherical_to_cartesian.2"] = Scoreboard("bs.out")["$vector.cartesian_to_spherical.2"]
+        function #bs.vector:spherical_to_cartesian {scaling:SCALE}
+        execute store result entity @s Motion[0] double (1/SCALE) run scoreboard players get $vector.spherical_to_cartesian.0 bs.out
+        execute store result entity @s Motion[1] double (1/SCALE) run scoreboard players get $vector.spherical_to_cartesian.1 bs.out
+        execute store result entity @s Motion[2] double (1/SCALE) run scoreboard players get $vector.spherical_to_cartesian.2 bs.out
+        tag @s remove DOPAK_FIREBALL_ROTATING_TAG
+
+
+ticker f"{__name__}/fireball_attack":
+    execute as @e[type=fireball, tag=DOPAK_FIREBALL_TAG, tag=!DOPAK_FIREBALL_FIRED_TAG]:
+        kill @e[type=interaction, tag=DOPAK_INTERACTION_TAG]
+        schedule function f"{__name__}/summon_interaction" 5t
+        tag @s add DOPAK_FIREBALL_FIRED_TAG
+        execute store result score $random hod.in run random value 1..4
+        if Scoreboard("hod.in")["$random"] > 2:
+            function f"{__name__}/split_fireball"
+
+ticker f"{__name__}/fireball_in_dopak":
+    execute as @n[type=interaction, tag=DOPAK_INTERACTION_TAG] at @e[type=fireball, tag=DOPAK_FIREBALL_REDIRECTED_TAG] if function #bs.hitbox:is_in_entity:
+        say hit
+

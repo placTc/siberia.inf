@@ -1,0 +1,29 @@
+from uuid import uuid4
+from bolt import Runtime
+from bolt_expressions import Scoreboard
+from functools import cache
+from contextlib import contextmanager
+from ./ticking_function import ticker
+
+@cache
+def triggered_score(function_name):
+    return function_name.replace(":", ".").replace("/", "__")
+
+triggered_functions = []
+def generate_trigger_scoreboards():
+    for func in triggered_functions:
+        scoreboard objectives add triggered_score(func) trigger
+        scoreboard players enable @a triggered_score(func)
+
+@contextmanager
+def _contextmanager(function_name):
+    triggered_functions.append(function_name.get_value())
+    ticker function_name:
+        yield
+
+macro triggered fname=minecraft:function body=mecha:nested_root:
+    with _contextmanager(fname):
+        execute as @p[scores={triggered_score(fname.get_value())=1..}]:
+            yield body
+            Scoreboard.objective(triggered_score(fname.get_value()))["@s"] = 0
+            scoreboard players enable @s triggered_score(fname.get_value())

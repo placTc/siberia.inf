@@ -1,0 +1,40 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:dried_ghast"
+    },
+    "title": "Infanticide",
+    "description": "Kill one of Döpak's minions after it's own death.",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "parent": "hod:bosses/dopak_dead",
+  "criteria": {
+    "dopak_dead": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_scores",
+            "entity": "this",
+            "scores": {
+              "hod.boss.dopak.dead": {
+                "min": 1
+              }
+            }
+          }
+        ],
+        "entity": {
+          "nbt": "{Tags: [\"hod.boss.dopak.minion\"]}"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "dopak_dead"
+    ]
+  ]
+}

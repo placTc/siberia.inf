@@ -1,6 +1,6 @@
 from bolt_expressions import Scoreboard, Data
 from ../../utils import generate_helper_function_unique_name
-from ../../triggers/triggered_function import tfunc, tfunc_score
+from ../../funcmacros/triggered_function import triggered, triggered_score
 from uuid import uuid4
 
 function f"{__name__}/give":
@@ -45,15 +45,15 @@ function f"{__name__}/quests_dialog_inf":
     $dialog show @s $(quests)
 
 function f"{__name__}/open_book_trigger":
-    trigger tfunc_score(f"{__name__}/open_book")
+    trigger triggered_score(f"{__name__}/open_book")
 
 tag = str(uuid4())
-tfunc f"{__name__}/restore_book_ability_on_join":
+triggered f"{__name__}/restore_book_ability_on_join":
     execute as @p at @s:
         advancement revoke @s only hod:mechanics/quests/use_questbook
         tag @s remove tag
 
-tfunc f"{__name__}/restore_book_ability":
+triggered f"{__name__}/restore_book_ability":
     scheduled = generate_helper_function_unique_name()
     function scheduled:
         execute as @p[tag=tag] at @s:
@@ -64,7 +64,7 @@ tfunc f"{__name__}/restore_book_ability":
     dialog clear @s
     schedule function scheduled 5t
 
-tfunc f"{__name__}/open_book":
+triggered f"{__name__}/open_book":
     update_journal()
     function f"{__name__}/journal_dialog_inf" with storage hod:dialogs
 
@@ -84,7 +84,7 @@ function f"{__name__}/load_journal_dialogs":
             label:"Back",
             action:{
                 type:"minecraft:run_command",
-                command: f"trigger {tfunc_score(f"{__name__}/open_book")}"
+                command: f"trigger {triggered_score(f"{__name__}/open_book")}"
             },
             width: 100
         }
@@ -105,7 +105,7 @@ function f"{__name__}/load_journal_dialogs":
             label:"Back",
             action:{
                 type:"minecraft:run_command",
-                command: f"trigger {tfunc_score(f"{__name__}/open_book")}"
+                command: f"trigger {triggered_score(f"{__name__}/open_book")}"
             },
             width: 100
         }
@@ -123,7 +123,7 @@ function f"{__name__}/load_journal_dialogs":
             label:"Close",
             action:{
                 type:"minecraft:run_command",
-                command: f"trigger {tfunc_score(f"{__name__}/restore_book_ability")}"
+                command: f"trigger {triggered_score(f"{__name__}/restore_book_ability")}"
             },
             width: 100
         },
@@ -132,7 +132,7 @@ function f"{__name__}/load_journal_dialogs":
                 label:"Active Quests",
                 action: {
                     type: "minecraft:run_command",
-                    command: f"trigger {tfunc_score(f"{__name__}/quests_dialog")}"
+                    command: f"trigger {triggered_score(f"{__name__}/quests_dialog")}"
                 },
                 width: 200
             },
@@ -140,7 +140,7 @@ function f"{__name__}/load_journal_dialogs":
                 label:"Notes",
                 action: {
                     type: "minecraft:run_command",
-                    command: f"trigger {tfunc_score(f"{__name__}/notes_dialog")}"
+                    command: f"trigger {triggered_score(f"{__name__}/notes_dialog")}"
                 },
                 width: 200
             }
@@ -181,7 +181,6 @@ temp = Data.storage("hod:temp")
 loop = Data.storage("inf:loop")
 
 get_goals_helper = generate_helper_function_unique_name()
-print(get_goals_helper)
 function get_goals_helper:
     $execute store result storage inf:loop jgoal int 1 run data get storage hod:quests active[$(jquest)].$(array)
     loop.jgoal -= 1
@@ -303,10 +302,10 @@ function f"{__name__}/update_quests":
 
 #     function f"{__name__}/update_quests_internal2"
 
-tfunc f"{__name__}/quests_dialog":
+triggered f"{__name__}/quests_dialog":
     function f"{__name__}/update_quests"
     function f"{__name__}/quests_dialog_inf" with storage hod:dialogs
 
-tfunc f"{__name__}/notes_dialog":
+triggered f"{__name__}/notes_dialog":
     function f"{__name__}/update_notes"
     function f"{__name__}/notes_dialog_inf" with storage hod:dialogs

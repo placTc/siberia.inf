@@ -1,0 +1,25 @@
+from uuid import uuid4
+from bolt import Runtime
+from bolt_expressions import Scoreboard
+from functools import cache
+from contextlib import contextmanager
+
+ticking_functions = []
+
+@contextmanager
+def _contextmanager(function_name):
+    ticking_functions.append(function_name.get_value())
+    function function_name:
+        yield
+
+def generate_tickers():
+    for func in ticking_functions:
+        fname = f"{func}_ticker_{str(uuid4())[:4]}"
+        function fname:
+            function func
+
+        function fname
+
+macro ticker fname=minecraft:function body=mecha:nested_root:
+    with _contextmanager(fname):
+        yield body
